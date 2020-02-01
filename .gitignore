@@ -1,2 +1,9 @@
-.pyc
-
+*.pyc
+exec_test.ksh
+*.log
+*weekly*
+*maintenance_month*
+data/*.txt
+data/save
+data/backhosts
+data/old.ip

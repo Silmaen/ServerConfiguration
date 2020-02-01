@@ -24,24 +24,28 @@ ymonth=`date +"%Y_%m"`
 . ${crscdir}/common/maintenance.ksh
 # Compress the log file of the month
 pack_monthly(){
-        if [[ -f ${logdir}/${logfile}_month_${ymonth}.tgz ]] then
-                return
-        fi
-        if [[ -f ${logdir}/${logfile}_year_${year}.tgz ]] then
-                return
-        fi
-        log_message "log" "Monthly packing"
-        tar czf ${logdir}/${logfile}_month_${ymonth}.tgz ${fulllogfile}
-        new_log
+	cd ${logdir}
+	if [[ -f ${logfile}_month_${ymonth}.tgz ]] then
+		return
+	fi
+	if [[ -f ${logfile}_year_${year}.tgz ]] then
+		return
+	fi
+	log_message "log" "Monthly packing"
+	tar czf ${logfile}_month_${ymonth}.tgz ${logfile}.log
+	new_log
+	cd -
 }
 # Compress the monthly compress log file of the year
 pack_yearly(){
-        if [[ ! -f ${logdir}/${logfile}_${ymonth}.tgz ]] then
-                pack_monthly
-        fi
-        tar czf ${logdir}/${logfile}_year_${year}.tgz ${logdir}/${logfile}_month_${year}*.tgz
-        rm ${logdir}/${logfile}_month_${year}*.tgz
-        log_message "log" "Happy new year!!"
+	cd ${logdir}
+	if [[ ! -f ${logfile}_${ymonth}.tgz ]] then
+		pack_monthly
+	fi
+	tar czf ${logfile}_year_${year}.tgz ${logfile}_month_${year}*.tgz
+	rm ${logfile}_month_${year}*.tgz
+	log_message "log" "Happy new year!!"
+	cd -
 }
 # execute all script in a directory
 execute_dir(){
