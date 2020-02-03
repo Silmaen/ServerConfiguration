@@ -89,6 +89,45 @@ def convert_mail(strlist):
     hf.addLine("<hr>")
     return hf.generate()
 
+def restartSmtpd():
+    lines = system_exec("rcctl restart smtpd")
+    for line in lines:
+        if 'failed' in line:
+            return False
+        if 'ok' not in line:
+            return False
+    return True
+
+def sendmail(mailfile, mailinglist):
+    lines = system_exec("cat " + mailfile + " | sendmail "+mailinglist)
+    if len(lines) == 0:
+        return True
+    # there is a problem
+    tempPb = False
+    for line in lines:
+        if "451" in line:
+            tempPb = True
+            break
+    if not tempPb:
+        # this is a true problem
+        write_log("mailing","Mail sending problem:")
+        for line in lines:
+            write_log("mailing",line)
+        return False
+    # attempt to restart smtpd:
+    if not restartSmtpd():
+        # error during restart
+        write_log("mailing","ERROR: unable to restart smtpd")
+        return False
+    # resend message
+    lines = system_exec("cat " + mailfile + " | sendmail "+mailinglist)
+    if len(lines) == 0:
+        return True
+    write_log("mailing","Mail sending problem:")
+    for line in lines:
+        write_log("mailing",line)
+    return False
+
 def main():
     #
     mailfile=os.getenv("mailfile","/var/maintenance/data/mail.txt")
@@ -117,15 +156,8 @@ def main():
     mailtxt.write("\n")
     mailtxt.write(htmllines+"\n")
     mailtxt.close()
-    stri=""
-    for mli in mainlinglist:
-        stri+=" "+mli
-    lines = system_exec("cat "+datadir+"/hmail | sendmail "+stri)
-    if len(lines) != 0:
-        # il y a probablement un souci, on log!
-        write_log("mailing","Probable Mailing Errors:")
-        for line in lines:
-            write_log("mailing",line)
+    stri=" ".join(mainlinglist)
+    if not sendmail(os.path.join(datadir,"hmail"),stri):
         # on ne save/flush QUE si le mail est bien parti!
         return
     if not os.path.exists(datadir+"/save"):

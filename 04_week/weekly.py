@@ -69,10 +69,10 @@ def login_account():
 def main():
     write_log("weekly","runing weekly procedure")
     #
-    hlines=setheaderlines()
+    #hlines=setheaderlines()
     add_mail("WEEKLY procedure\n=====")
-    for hline in hlines:
-        add_mail(hline)
+    #for hline in hlines:
+    #    add_mail(hline)
     #
     locate_database()
     #
