@@ -120,7 +120,7 @@ def backup_hosts(leases):
             return True
     return False
 
-if __name__ == "__main__":
+def main():
     leases=read_leases()
     if backup_hosts(leases):
         write_log("lslease","Zone update required")
@@ -128,4 +128,6 @@ if __name__ == "__main__":
         system_exec("rcctl restart nsd unbound","lslease")
     else:
         write_log("lslease","No zone update required")
-
+        
+if __name__ == "__main__":
+    main()

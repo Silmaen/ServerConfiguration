@@ -1,17 +1,19 @@
 #!/usr/bin/env python
 
 import os
+import sys
 import time
+import datetime
 import subprocess
 import base64
 import http.client
 import urllib.parse
 
 localpath="/var/maintenance"
-logdir=localpath+"/log"
-datadir=localpath+"/data"
+logdir=os.path.join(localpath, "log")
+datadir=os.path.join(localpath, "data")
 logfile="maintenance"
-fulllogfile=logdir+"/"+logfile+".log"
+fulllogfile=os.path.join(logdir, logfile+".log")
 
 def new_log():
     ffi = os.getenv("fulllogfile","")
@@ -92,7 +94,7 @@ def system_exec(cmd,who="",what=""):
         else:
             msg="ERROR executing "+what
         write_log(twho,msg)
-        return
+        return []
     lines=out.decode("utf-8").splitlines()
     return lines
 

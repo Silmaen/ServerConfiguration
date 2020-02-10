@@ -94,8 +94,8 @@ def sendtoovh(localip):
         else:
             write_log("dynhost",HOST + " " + lines + " -unknown result line")
 
-# test si la connexion internet existe
-if __name__ == "__main__":
+def main():
+    # test si la connexion internet existe
     write_log("dynhost","starting dynhost update")
     if is_online():
         write_log("dynhost","Internet connexion is UP")
@@ -116,3 +116,5 @@ if __name__ == "__main__":
         write_log("dynhost","Internet connexion is DOWN")
         set_lastip("0.0.0.0")
 
+if __name__ == "__main__":
+    main()

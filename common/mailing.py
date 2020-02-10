@@ -6,7 +6,7 @@ import sys
 sys.path.insert(0,crscdir)
 from common.maintenance import *
 import subprocess
-import htmlwrite
+import common.htmlwrite
 import shutil
 
 # line followed by this line is automatically transformed into 'section title'
