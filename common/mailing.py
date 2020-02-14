@@ -6,37 +6,32 @@ import shutil
 
 # line followed by this line is automatically transformed into 'section title'
 #           h1       h2      h3     h4    h5     h6
-titlestr = ["======", "=====", "====", "===", "----", "---"]
+title_str = ["======", "=====", "====", "===", "----", "---"]
 # syntax coloring: key words
-colorstr = {}
-colorstr["Ok"] = "#00C800"
-colorstr["Better"] = "#00C800"
-colorstr["Passed"] = "#00C800"
-colorstr["Warning"] = "#FFAF00"
-colorstr["Worse"] = "#FFAF00"
-colorstr["Error"] = "red"
-colorstr["Failed"] = "red"
-colorstr["Unfeasable"] = "red"
+color_str = {"Ok": "#00C800", "Better": "#00C800", "Passed": "#00C800", "Warning": "#FFAF00", "Worse": "#FFAF00",
+             "Error": "red", "Failed": "red", "Unfeasable": "red"}
 # syntax coloring: key lines
-colorline = {}
-colorline["[V]"] = "#8000B8"
+color_line = {"[V]": "#8000B8"}
 #
-mainlinglist = ["argawaen@argawaen.net"]
+mailing_list = ["argawaen@argawaen.net"]
+mail_file_html = os.path.join(data_dir, "hmail")
+mail_file_html_content = os.path.join(data_dir, "mail.html")
+mailing_string = " ".join(mailing_list)
 
 
 #
 def convert_mail(strlist, formatted: bool = False):
     hf = htmlfile(title="[Maintenance] srv.argawaen.net")
-    hf.setKeywordColor(colorstr)
+    hf.setKeywordColor(color_str)
     hf.setFormatted(formatted)
     premode = 0
     listniv = 0
-    for id, line in enumerate(strlist):
+    for line_id, line in enumerate(strlist):
         cline = line.strip()
         nline = ""
         # retrieving the 'next' line
-        if id + 1 < len(strlist):
-            nline = strlist[id + 1]
+        if line_id + 1 < len(strlist):
+            nline = strlist[line_id + 1]
             nline = nline.strip()
         # VERBATIM mode activation/deactivation
         if cline == "[VERBATIM]":
@@ -52,9 +47,9 @@ def convert_mail(strlist, formatted: bool = False):
             hf.addLine(cline + "\n")
             continue
         # coloring line
-        for key in colorline.keys():
+        for key in color_line.keys():
             if cline.startswith(key):
-                cline = "<font color=\"" + colorline[key] + "\">" + cline.lstrip(key).strip() + "</font>"
+                cline = "<font color=\"" + color_line[key] + "\">" + cline.lstrip(key).strip() + "</font>"
         #   treatment of an empty line
         if cline == "":
             # if we were in the list, close the list
@@ -72,11 +67,11 @@ def convert_mail(strlist, formatted: bool = False):
             listniv += 1
             continue
         # ignore title identifier line
-        if cline in titlestr:
+        if cline in title_str:
             continue
         # check for a title modifier
-        if nline in titlestr:
-            niv = titlestr.index(nline) + 1
+        if nline in title_str:
+            niv = title_str.index(nline) + 1
             if niv < 3:
                 hf.addLine("<hr>")
             hf.addSection(cline, niv)
@@ -87,7 +82,7 @@ def convert_mail(strlist, formatted: bool = False):
     return hf.generate()
 
 
-def restartSmtpd():
+def restart_smtpd():
     lines = system_exec("rcctl restart smtpd")
     for line in lines:
         if 'failed' in line:
@@ -97,29 +92,29 @@ def restartSmtpd():
     return True
 
 
-def sendmail(mailfile, mailinglist):
-    lines = system_exec("cat " + mailfile + " | sendmail " + mailinglist)
+def sendmail(local_mail_file, local_mailing_list):
+    lines = system_exec("cat " + local_mail_file + " | sendmail " + local_mailing_list)
     if len(lines) == 0:
         return True
     # there is a problem
-    tempPb = False
+    temp_pb = False
     for line in lines:
         if "451" in line:
-            tempPb = True
+            temp_pb = True
             break
-    if not tempPb:
+    if not temp_pb:
         # this is a true problem
         write_log("mailing", "Mail sending problem:")
         for line in lines:
             write_log("mailing", line)
         return False
     # attempt to restart smtpd:
-    if not restartSmtpd():
+    if not restart_smtpd():
         # error during restart
         write_log("mailing", "ERROR: unable to restart smtpd")
         return False
     # resend message
-    lines = system_exec("cat " + mailfile + " | sendmail " + mailinglist)
+    lines = system_exec("cat " + local_mail_file + " | sendmail " + local_mailing_list)
     if len(lines) == 0:
         return True
     write_log("mailing", "Mail sending problem:")
@@ -130,41 +125,46 @@ def sendmail(mailfile, mailinglist):
 
 def main(cleanup: bool = True, formatted: bool = False):
     #
-    if not os.path.exists(mailfile):
-        # TODO setup a verbosity level as GLOBAL Variable
+    if not os.path.exists(mail_file_txt):
         if not cleanup:
-            write_log("mailing", "no mail file named:" + mailfile)
+            write_log("mailing", "no mail file named:" + mail_file_txt)
         return
     #
     write_log("mailing", "Mail need to be sent")
-    ffi = open(mailfile, "r")
+    # get the mail data
+    ffi = open(mail_file_txt, "r")
     lines = ffi.readlines()
     ffi.close()
-    htmllines = convert_mail(lines, formatted)
-    headerlines = ["From: maintenance@argawaen.net"]
-    stri = "To:"
-    for mli in mainlinglist:
-        stri += " " + mli
-    headerlines.append(stri)
-    headerlines.append("Subject: Activity repport from argawaen.net server")
-    headerlines.append("Mime-Version: 1.0")
-    headerlines.append("Content-Type: text/html")
-    mailtxt = open(datadir + "/hmail", "w")
-    for line in headerlines:
-        mailtxt.write(line + "\n")
-    mailtxt.write("\n")
-    mailtxt.write(htmllines + "\n")
-    mailtxt.close()
-    stri = " ".join(mainlinglist)
-    if not sendmail(os.path.join(datadir, "hmail"), stri):
-        # on ne save/flush QUE si le mail est bien parti!
+
+    # store an html formatted version
+    fp = open(mail_file_html_content, "w")
+    fp.write(convert_mail(lines, True))
+    fp.close()
+
+    # convert to compressed html format
+    html_lines_mail = convert_mail(lines, formatted)
+
+    # create the header lines
+    header_lines = "\n".join(["From: maintenance@argawaen.net", mailing_string,
+                              "Subject: Activity repport from argawaen.net server", "Mime-Version: 1.0",
+                              "Content-Type: text/html"])
+
+    mail_txt = open(mail_file_html, "w")
+    mail_txt.write(header_lines + "\n")
+    mail_txt.write("\n")
+    mail_txt.write(html_lines_mail + "\n")
+    mail_txt.close()
+    if not sendmail(mail_file_html, mailing_string):
+        # do save+flush ONLY if mail is sent successfully
         return
-    if not os.path.exists(datadir + "/save"):
-        os.makedirs(datadir + "/save")
-    shutil.copy2(datadir + "/hmail", datadir + "/save/hmail")
-    shutil.copy2(mailfile, datadir + "/save/mail.txt")
+    save_dir = os.path.join(data_dir, "save")
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+    for f in [mail_file_html, mail_file_txt, mail_file_html_content]:
+        shutil.copy2(f, os.path.join(save_dir, os.path.basename(f)))
     if cleanup:
-        os.remove(datadir + "/hmail")
+        for f in [mail_file_html, mail_file_html_content]:
+            os.remove(f)
         flush_mail()
 
 

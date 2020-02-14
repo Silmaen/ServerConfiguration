@@ -1,21 +1,21 @@
 #!/usr/bin/env python
 
-import os
-crscdir=os.getenv("crscdir","/var/maintenance")
-import sys
-sys.path.insert(0,crscdir)
-from common.maintenance import *
 from common.trafic_cst import *
 
-def main():
-    write_log("trafic_day","Daily Trafic Statistics")
-    oldinterf=loadresu()
+
+def main(dry_run: bool = False):
+    write_log("trafic_day", "Daily Trafic Statistics")
+    oldinterf = load_result()
     for key in Interface.keys():
         if key not in oldinterf.keys():
             continue
-        write_log("trafic",Interface[key]+" out:"+bytehuman(oldinterf[key]["out"])+" in:"+bytehuman(oldinterf[key]["in"]))
-        add_mail(Interface[key]+" out:"+bytehuman(oldinterf[key]["out"])+" in:"+bytehuman(oldinterf[key]["in"]))
-    os.remove(traficfileday)
-        
+        write_log("trafic", Interface[key] + " out:" + byte_human(oldinterf[key]["out"]) + " in:" + byte_human(
+            oldinterf[key]["in"]))
+        add_mail(
+            Interface[key] + " out:" + byte_human(oldinterf[key]["out"]) + " in:" + byte_human(oldinterf[key]["in"]))
+    if not dry_run:
+        os.remove(traffic_file_day)
+
+
 if __name__ == "__main__":
     main()

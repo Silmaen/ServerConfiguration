@@ -9,61 +9,54 @@ import base64
 import http.client
 import urllib.parse
 
-localpath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-logdir = os.path.join(localpath, "log")
-datadir = os.path.join(localpath, "data")
+local_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+log_dir = os.path.join(local_path, "log")
+data_dir = os.path.join(local_path, "data")
 logfile = "maintenance"
-fulllogfile = os.path.join(logdir, logfile + ".log")
-mailfile = os.path.join(datadir, "mail.txt")
+full_logfile = os.path.join(log_dir, logfile + ".log")
+mail_file_txt = os.path.join(data_dir, "mail.txt")
+
 
 def new_log():
     """
     Initialize a new log file
     """
-    ffi = os.getenv("fulllogfile", "")
-    if ffi == "":
-        ffi = fulllogfile
-    f = open(ffi, "w")
-    dnow = time.time()
+    f = open(full_logfile, "w")
     f.write(time.strftime("%Y %h %d %H:%M:%S") + " [log] : Starting new log file\n")
     f.close()
 
 
-def write_log(qui, strtodisplay):
+def write_log(qui: str, str_to_display: str):
     """
     Write into the log file
     qui: which application is writing into the log filem
-    strtodisplay: the message to print
+    str_to_display: the message to print
     """
     if qui == "":
         return
-    ffi = os.getenv("fulllogfile", "")
-    if ffi == "":
-        ffi = fulllogfile
-    if not os.path.exists(ffi):
+    if not os.path.exists(full_logfile):
         new_log()
-    f = open(ffi, "a")
-    dnow = time.time()
-    f.write(time.strftime("%Y %h %d %H:%M:%S") + " [" + qui + "] : " + strtodisplay + "\n")
+    f = open(full_logfile, "a")
+    f.write(time.strftime("%Y %h %d %H:%M:%S") + " [" + qui + "] : " + str_to_display + "\n")
     f.close()
 
 
-ipfile = datadir + "/old.ip"
+ip_file = data_dir + "/old.ip"
 
 
-def get_lastip():
-    oldip = "0.0.0.0"
-    if os.path.exists(ipfile):
-        ffi = open(ipfile, 'r')
-        oldip = ffi.readline().strip()
+def get_last_ip():
+    old_ip = "0.0.0.0"
+    if os.path.exists(ip_file):
+        ffi = open(ip_file, 'r')
+        old_ip = ffi.readline().strip()
         ffi.close()
-    return oldip;
+    return old_ip
 
 
-def set_lastip(newip):
-    items = newip.strip().split(".")
+def set_last_ip(new_ip):
+    items = new_ip.strip().split(".")
     if len(items) != 4:
-        write_log("set_lastip", "Wrong number of items in IP '" + str(newip) + "'")
+        write_log("set_last_ip", "Wrong number of items in IP '" + str(new_ip) + "'")
         return
     try:
         p1 = int(items[0])
@@ -71,32 +64,26 @@ def set_lastip(newip):
         p3 = int(items[2])
         p4 = int(items[3])
     except:
-        write_log("set_lastip", "Wrong number format in IP '" + str(newip) + "'")
+        write_log("set_last_ip", "Wrong number format in IP '" + str(new_ip) + "'")
         return
     if p1 < 0 or 255 < p1:
-        write_log("set_lastip", "Wrong number value in IP '" + str(newip) + "'")
+        write_log("set_last_ip", "Wrong number value in IP '" + str(new_ip) + "'")
         return
     if p2 < 0 or 255 < p2:
-        write_log("set_lastip", "Wrong number value in IP '" + str(newip) + "'")
+        write_log("set_last_ip", "Wrong number value in IP '" + str(new_ip) + "'")
         return
     if p3 < 0 or 255 < p3:
-        write_log("set_lastip", "Wrong number value in IP '" + str(newip) + "'")
+        write_log("set_last_ip", "Wrong number value in IP '" + str(new_ip) + "'")
         return
     if p4 < 0 or 255 < p4:
-        write_log("set_lastip", "Wrong number value in IP '" + str(newip) + "'")
+        write_log("set_last_ip", "Wrong number value in IP '" + str(new_ip) + "'")
         return
-    ffi = open(ipfile, 'w')
-    ffi.write(newip.strip())
+    ffi = open(ip_file, 'w')
+    ffi.write(new_ip.strip())
     ffi.close()
 
 
-def system_exec(cmd, who="", what=""):
-    if type(cmd) != str:
-        return []
-    if type(who) != str:
-        return []
-    if type(what) != str:
-        return []
+def system_exec(cmd: str, who: str = "", what: str = ""):
     if cmd == "":
         return []
     try:
@@ -116,134 +103,95 @@ def system_exec(cmd, who="", what=""):
 
 
 def ping_host(host):
-    basecmd = "ping -q -c 1 -w 5 " + host
-    lines = system_exec(basecmd, "ping_host")
-    morceaux = []
+    base_cmd = "ping -q -c 1 -w 5 " + host
+    lines = system_exec(base_cmd, "ping_host")
+    items = []
     for line in lines:
         if "packets transmitted," not in line: continue
-        morceaux = line.split(",")
+        items = line.split(",")
         break
-    if len(morceaux) != 3:
+    if len(items) != 3:
         return False
     try:
-        nbtran = int(morceaux[0].strip().split()[0])
-        nbrece = int(morceaux[1].strip().split()[0])
+        nb_tran = int(items[0].strip().split()[0])
+        nb_received = int(items[1].strip().split()[0])
     except:
-        write_log("ping_host", "ERREUR de resultat" + str(morceaux))
+        write_log("ping_host", "ERROR in results" + str(items))
         return False
-    if nbtran == nbrece:
+    if nb_tran == nb_received:
         return True
     return False
 
 
 def get_host_ip(host):
-    basecmd = "ping -q -c 1 -w 5 " + host
-    lines = system_exec(basecmd, "ping_host")
+    base_cmd = "ping -q -c 1 -w 5 " + host
+    lines = system_exec(base_cmd, "ping_host")
     if len(lines) == 0:
         return "0.0.0.0"
-    if not "(" in lines[0] or ")" not in lines[0]:
+    if "(" not in lines[0] or ")" not in lines[0]:
         return "0.0.0.0"
     return lines[0].split("(", 1)[-1].split(")", 1)[0]
 
 
-def existHttpPage(url, user="", password=""):
-    if type(url) != str:
-        return False
-    if type(user) != str:
-        return False
-    if type(password) != str:
-        return False
-    validtype = ["http", "https"]
-    if not "://" in url:
+def get_http_response(url: str, user: str = "", password: str = ""):
+    valid_type = ["http", "https"]
+    if "://" not in url:
         url = "http://" + url
     dec = urllib.parse.urlparse(url)
-    if dec.scheme not in validtype:
-        write_log("getHttpPage", "type of page: '" + dec.scheme + "' valid type: " + str(validtype))
-        return (False)
     if "." not in dec.netloc:
-        write_log("getHttpPage", "Bad hostname: " + dec.netloc)
-        return (False)
+        write_log("exist_http_page", "Bad hostname: " + dec.netloc)
+        return False
     if dec.scheme == "http":
         h2 = http.client.HTTPConnection(dec.netloc, timeout=50)
     elif dec.scheme == "https":
         h2 = http.client.HTTPSConnection(dec.netloc, timeout=50)
+    else:
+        write_log("exist_http_page", "unsupported dec.scheme: '" + dec.scheme + "' valid type: " + str(valid_type))
+        return False
     request = dec.path
     if dec.query != "":
         request += "?" + dec.query
     h2.putrequest("GET", request)
     if user != "":
-        authstr = user + ":" + password
-        authstring = base64.b64encode(authstr.encode("ascii")).decode("ascii").replace('\n', '')
-        h2.putheader("AUTHORIZATION", "Basic " + authstring)
+        auth_str = user + ":" + password
+        auth_string = base64.b64encode(auth_str.encode("ascii")).decode("ascii").replace('\n', '')
+        h2.putheader("AUTHORIZATION", "Basic " + auth_string)
     h2.endheaders()
-    hresponse = h2.getresponse()
-    try:
-        httpdata = hresponse.read().decode("ascii").splitlines()
-    except:
-        httpdata = []
-    if hresponse.status == 200:
+    return h2.getresponse()
+
+
+def exist_http_page(url: str, user: str = "", password: str = ""):
+    http_response = get_http_response(url, user, password)
+    if http_response.status == 200:
         return True
     else:
         return False
 
 
-def getHttpPage(url, user="", password=""):
-    if type(url) != str:
-        return []
-    if type(user) != str:
-        return []
-    if type(password) != str:
-        return []
-    validtype = ["http", "https"]
-    if not "://" in url:
-        url = "http://" + url
-    dec = urllib.parse.urlparse(url)
-    if dec.scheme not in validtype:
-        write_log("getHttpPage", "type of page: '" + dec.scheme + "' valid type: " + str(validtype))
-        return []
-    if "." not in dec.netloc:
-        write_log("getHttpPage", "Bad hostname: " + dec.netloc)
-        return []
-    if dec.scheme == "http":
-        h2 = http.client.HTTPConnection(dec.netloc, timeout=50)
-    elif dec.scheme == "https":
-        h2 = http.client.HTTPSConnection(dec.netloc, timeout=50)
-    # write_log("getHttpPage","decode " + str(dec))
-    request = dec.path
-    if dec.query != "":
-        request += "?" + dec.query
-    h2.putrequest("GET", request)
-    if user != "":
-        authstr = user + ":" + password
-        authstring = base64.b64encode(authstr.encode("ascii")).decode("ascii").replace('\n', '')
-        h2.putheader("AUTHORIZATION", "Basic " + authstring)
-    h2.endheaders()
-    hresponse = h2.getresponse()
+def get_http_page(url: str, user: str = "", password: str = ""):
+    http_response = get_http_response(url, user, password)
     try:
-        httpdata = hresponse.read().decode("ascii").splitlines()
+        http_data = http_response.read().decode("ascii").splitlines()
     except:
-        httpdata = []
-    if hresponse.status == 200:
-        return httpdata
-    write_log("getHttpPage", "ERROR " + str(hresponse.status) + " : " + str(hresponse.reason))
-    write_log("getHttpPage", "  proto  : " + str(dec.scheme))
-    write_log("getHttpPage", "  host   : " + str(dec.netloc))
-    write_log("getHttpPage", "  request: " + str(request))
-    return httpdata
+        http_data = []
+    if http_response.status == 200:
+        return http_data
+    write_log("getHttpPage", "ERROR " + str(http_response.status) + " : " + str(http_response.reason))
+    return http_data
 
 
-def add_mail(stri):
-    if not os.path.exists(mailfile):
-        ffi = open(mailfile, "w")
-        ffi.write("Activity repport from argawaen.net server\n")
+def add_mail(message):
+    if not os.path.exists(mail_file_txt):
+        ffi = open(mail_file_txt, "w")
+        ffi.write("Activity report from argawaen.net server\n")
         ffi.write("======\n\n")
         ffi.write(time.strftime("%Y %h %d %H:%M:%S") + "\n")
     else:
-        ffi = open(mailfile, "a")
-    ffi.write(stri + "\n")
+        ffi = open(mail_file_txt, "a")
+    ffi.write(message + "\n")
     ffi.close()
 
 
 def flush_mail():
-    if os.path.exists(mailfile):
-        os.remove(mailfile)
+    if os.path.exists(mail_file_txt):
+        os.remove(mail_file_txt)

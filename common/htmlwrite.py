@@ -7,7 +7,7 @@ mail: argawaen@argawaen.net
 """
 from .maintenance import *
 
-# standard predifed color in html
+# standard predefined color in html
 __PREDEFINED_COLOR = {
     'white': '#FFFFFF',
     'silver': '#C0C0C0',
@@ -52,8 +52,8 @@ class htmlfile:
     """
 
     def __init__(self, name="", title=""):
-        '''
-        '''
+        """
+        """
         # the file name
         if type(name) == str:
             self.__name = name
@@ -175,13 +175,13 @@ class htmlfile:
         out += stab + stab + '<meta http-equiv="content-type" content="text/html; charset=utf-8" >' + lend
         out += stab + stab + '<meta name="robot" content="index,follow">' + lend
         out += stab + stab + '<meta name="author" content="maintenance">' + lend
-        css_file = os.path.join(datadir, "mail.css")
+        css_file = os.path.join(data_dir, "mail.css")
         if os.path.exists(css_file):
             out += stab + stab + '<style media="screen" type="text/css">' + lend
             fp = open(css_file, "r")
-            out += "".join([line.strip() for line in fp.readlines()]).replace(" ", "") + lend
+            out += "".join([line.strip() for line in fp.readlines()]) + lend
             fp.close()
-            out += stab + stab + '</style">' + lend
+            out += stab + stab + '</style>' + lend
         out += stab + "</head>" + lend
         out += stab + "<body>" + lend
         for line in self.__lines:

@@ -1,38 +1,36 @@
 #!/usr/bin/env python
 # -*- coding : utf-8 -*-
-import os
-crscdir=os.getenv("crscdir","/var/maintenance")
-import sys
-sys.path.insert(0,crscdir)
-from common.maintenance import *
 from common.Connexion_DB import *
 
-
-MySQLParams ={
-'host':"localhost",
-'user':"robot",
-'passwd':"Robot123",
-'db':"adiministration"
+MySQLParams = {
+    'host': "localhost",
+    'user': "robot",
+    'passwd': "Robot123",
+    'db': "adiministration"
 }
 
-def main():
-    #to  lighten th log files... write_log("connexion_table","check connexion table")
-    # initilaize data and connect to mysql database
-    #DB=MyDataBase(MySQLParams,"connexion_table")
-    DB=MyDataBase(MySQLParams,"")
-    if not DB.connexionToDataBase():
-        sys.exit(1)
-    # read database
-    if not DB.getActiveMachineList():
-        sys.exit(1)
-    # look for truely connected machines
-    DB.getConnectedMachines()
-    # do the comparison between DataBase and measures
-    DB.compareMachineList()
-    # actualize the server DataBase
-    DB.ActualizeDB()
-    # close connexion to the server
-    DB.connexionClose()
 
-if __name__=="__main__":
+def main(dry_run: bool = False):
+    # to  lighten th log files... write_log("connexion_table","check connexion table")
+    # initialize data and connect to mysql database
+    db = MyDataBase(MySQLParams, "")
+    if not db.db_connexion():
+        write_log("connexion_table", "No connexion to MySQL database!")
+        return
+    # read database
+    if not db.get_active_machine_list():
+        write_log("connexion_table", "MySQL database has no Active machine list")
+        return
+    # look for true connected machines
+    db.get_connected_machines()
+    # do the comparison between DataBase and measures
+    db.compare_machine_list()
+    # actualize the server DataBase
+    if not dry_run:
+        db.bd_actualize()
+    # close connexion to the server
+    db.close_connexion()
+
+
+if __name__ == "__main__":
     main()

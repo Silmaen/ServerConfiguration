@@ -8,3 +8,4 @@ data/old.ip
 data/hmail
 .idea
 */__pycache__
+data/*.html
