@@ -145,7 +145,7 @@ def main(cleanup: bool = True, formatted: bool = False):
     html_lines_mail = convert_mail(lines, formatted)
 
     # create the header lines
-    header_lines = "\n".join(["From: maintenance@argawaen.net", mailing_string,
+    header_lines = "\n".join(["From: maintenance@argawaen.net", "To: " + mailing_string,
                               "Subject: Activity repport from argawaen.net server", "Mime-Version: 1.0",
                               "Content-Type: text/html"])
 
