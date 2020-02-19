@@ -11,8 +11,11 @@ MySQLParams = {
 }
 
 
-def main():
-    write_log("ClientStatistics", "Check for client stat")
+def main(dry_run: bool = False):
+    if dry_run:
+        write_log("ClientStatistics", "Check for client stat dry run")
+    else:
+        write_log("ClientStatistics", "Check for client stat")
     ending = datetime.datetime.now()
     starting = ending - datetime.timedelta(days=1)
     db = MyDataBase(MySQLParams, "ClientStatistic")
