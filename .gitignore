@@ -9,3 +9,5 @@ data/hmail
 .idea
 */__pycache__
 data/*.html
+*.out
+*.old
