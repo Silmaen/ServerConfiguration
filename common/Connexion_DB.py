@@ -106,7 +106,7 @@ class MyDataBase:
 
     def get_connected_machines(self):
         self.ConnectedMachines = {}
-        lines = system_exec('netstat -rf inet | grep "UHLc"')
+        ret, lines = system_exec('netstat -rf inet | grep "UHLc"')
         for i, l in enumerate(lines):
             #            IP=lines2[i].split()[0]
             name = l.split()[0]

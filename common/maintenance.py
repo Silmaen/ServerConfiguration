@@ -1,9 +1,8 @@
-#!/usr/bin/env python
-
+"""
+common helper functions
+"""
 import os
-import sys
 import time
-import datetime
 import subprocess
 import base64
 import http.client
@@ -42,7 +41,6 @@ def write_log(qui: str, str_to_display: str):
 
 
 ip_file = data_dir + "/old.ip"
-
 
 def get_last_ip():
     old_ip = "0.0.0.0"
@@ -85,9 +83,9 @@ def set_last_ip(new_ip):
 
 def system_exec(cmd: str, who: str = "", what: str = ""):
     if cmd == "":
-        return []
+        return -1, []
     try:
-        out, _ = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True).communicate()
+        p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
     except (ValueError, OSError) as err:
         twho = who
         if twho == "":
@@ -97,14 +95,22 @@ def system_exec(cmd: str, who: str = "", what: str = ""):
         else:
             msg = "ERROR executing " + what
         write_log(twho, msg)
-        return []
-    lines = out.decode("utf-8").splitlines()
-    return lines
+        return -2, []
+    try:
+        enc = os.device_encoding(1)
+        if not enc:
+            enc = "ascii"
+        lines = p.stdout.decode(enc).splitlines()
+    except:
+        return -3, []
+    return p.returncode, lines
 
 
 def ping_host(host):
     base_cmd = "ping -q -c 1 -w 5 " + host
-    lines = system_exec(base_cmd, "ping_host")
+    ret, lines = system_exec(base_cmd, "ping_host")
+    if ret != 0:
+        return False
     items = []
     for line in lines:
         if "packets transmitted," not in line: continue
@@ -125,8 +131,8 @@ def ping_host(host):
 
 def get_host_ip(host):
     base_cmd = "ping -q -c 1 -w 5 " + host
-    lines = system_exec(base_cmd, "ping_host")
-    if len(lines) == 0:
+    ret, lines = system_exec(base_cmd, "ping_host")
+    if len(lines) == 0 or ret != 0:
         return "0.0.0.0"
     if "(" not in lines[0] or ")" not in lines[0]:
         return "0.0.0.0"
@@ -141,12 +147,16 @@ def get_http_response(url: str, user: str = "", password: str = ""):
     if "." not in dec.netloc:
         write_log("exist_http_page", "Bad hostname: " + dec.netloc)
         return False
-    if dec.scheme == "http":
-        h2 = http.client.HTTPConnection(dec.netloc, timeout=50)
-    elif dec.scheme == "https":
-        h2 = http.client.HTTPSConnection(dec.netloc, timeout=50)
-    else:
-        write_log("exist_http_page", "unsupported dec.scheme: '" + dec.scheme + "' valid type: " + str(valid_type))
+    try:
+        if dec.scheme == "http":
+            h2 = http.client.HTTPConnection(dec.netloc, timeout=50)
+        elif dec.scheme == "https":
+            h2 = http.client.HTTPSConnection(dec.netloc, timeout=50)
+        else:
+            write_log("exist_http_page", "unsupported dec.scheme: '" + dec.scheme + "' valid type: " + str(valid_type))
+            return False
+    except TimeoutError as err:
+        write_log("exist_http_page", "Error: Request to: " + str(dec.netloc) + " has timed out!!")
         return False
     request = dec.path
     if dec.query != "":

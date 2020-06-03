@@ -31,7 +31,7 @@ def line_word(string_to_split):
 
 
 def get_traffic():
-    results = system_exec("netstat -nlib")
+    ret, results = system_exec("netstat -nlib")
     if len(results) < 1:
         write_log("get_traffic", "ERROR while retrieving traffic")
     res_interface = {}

@@ -4,7 +4,7 @@
 
 The default directory for maintenance install is '/var/maintenance' however, it could be installed anywhere. (in the following the base installation dir used is the default one, if you are using a different one just change the paths)
 
-These maintenances script are designed for OpenBSD 6.6, they came in replacement of the default ones (/etc/[daily,weekly,monthly]) so make sure to deactivate them in the root's crontab
+These maintenances script are designed for OpenBSD 6.7, they came in replacement of the default ones (/etc/[daily,weekly,monthly]) so make sure to deactivate them in the root's crontab
 
 ### requirements ###
 

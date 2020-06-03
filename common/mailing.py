@@ -83,7 +83,7 @@ def convert_mail(strlist, formatted: bool = False):
 
 
 def restart_smtpd():
-    lines = system_exec("rcctl restart smtpd")
+    ret, lines = system_exec("rcctl restart smtpd")
     for line in lines:
         if 'failed' in line:
             return False
@@ -93,7 +93,7 @@ def restart_smtpd():
 
 
 def sendmail(local_mail_file, local_mailing_list):
-    lines = system_exec("cat " + local_mail_file + " | sendmail " + local_mailing_list)
+    ret, lines = system_exec("cat " + local_mail_file + " | sendmail " + local_mailing_list)
     if len(lines) == 0:
         return True
     # there is a problem
@@ -114,7 +114,7 @@ def sendmail(local_mail_file, local_mailing_list):
         write_log("mailing", "ERROR: unable to restart smtpd")
         return False
     # resend message
-    lines = system_exec("cat " + local_mail_file + " | sendmail " + local_mailing_list)
+    ret, lines = system_exec("cat " + local_mail_file + " | sendmail " + local_mailing_list)
     if len(lines) == 0:
         return True
     write_log("mailing", "Mail sending problem:")
