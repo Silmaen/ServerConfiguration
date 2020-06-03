@@ -53,8 +53,8 @@ class MyDataBase:
     def db_connexion(self):
         try:
             self.__con = MySQLdb.connect(**self.params)
-            if len(self.script) > 0:
-                write_log(self.script, "Connection to data base established!")
+            #if len(self.script) > 0:
+            #    write_log(self.script, "Connection to data base established!")
             if not self.__con:
                 write_log(self.script, "Connexion Error")
                 self.__con = None

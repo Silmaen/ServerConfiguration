@@ -15,7 +15,7 @@ def read_leases(filename=""):
     if filename == "":
         filename = os.path.join(default_lease_location, default_lease_file)
     if not os.path.exists(filename):
-        write_log("lslease", "ERROR: no lease files foud at '" + filename + "'")
+        write_log("lslease", "ERROR: no lease files found at '" + filename + "'")
         return {}
     ff = open(filename, "r")
     lines = ff.readlines()
