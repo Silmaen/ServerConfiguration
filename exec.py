@@ -3,6 +3,7 @@
 from common.maintenance import *
 import argparse
 import common.mailing as mailing
+import datetime
 
 the_date = datetime.datetime.now()
 tomorrow_date = the_date + datetime.timedelta(days=1)
