@@ -21,7 +21,7 @@ def main(dry_run: bool = False):
         ffi.close()
         # -- actualize table in pf --
         cmd = "pfctl -t " + ban_ip_table + " -T replace -f /etc/banlist"
-        lines = system_exec(cmd, "actualize_ban", " banlist update")
+        ret, lines = system_exec(cmd, "actualize_ban", " banlist update")
         for line in lines:
             write_log("actualize_ban", line)
 
