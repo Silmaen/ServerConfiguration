@@ -1,12 +1,20 @@
 #!/usr/bin/env python
-
+"""
+script for trafic computation
+"""
 from common.trafic_cst import *
 
 
 def add_to_data(old_interface, r_interface):
+    """
+    compute trafic and update database
+    :param old_interface:
+    :param r_interface:
+    :return:
+    """
     values = {}
     if os.path.exists(traffic_file_day):
-        ft = open(traffic_file_day, "r")
+        ft = open(traffic_file_day)
         ll = ft.readlines()
         ft.close()
         for line in ll:
@@ -36,6 +44,11 @@ def add_to_data(old_interface, r_interface):
 
 
 def main(dry_run: bool = False):
+    """
+    main script execution
+    :param dry_run: if the script should be run without system modification
+    :return:
+    """
     write_log("trafic", "Traffic computation")
     old_interface = load()
     r_interface = get_traffic()

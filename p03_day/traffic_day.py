@@ -1,9 +1,16 @@
 #!/usr/bin/env python
-
+"""
+script to determine the daily network trafic
+"""
 from common.trafic_cst import *
 
 
 def main(dry_run: bool = False):
+    """
+    main script execution
+    :param dry_run: if the script should be run without system modification
+    :return:
+    """
     write_log("trafic_day", "Daily Trafic Statistics")
     oldinterf = load_result()
     for key in Interface.keys():

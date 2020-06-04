@@ -9,6 +9,10 @@ IPFILE = os.path.join(data_dir, "old.ip")
 
 
 def is_online():
+    """
+    are we online?
+    :return:
+    """
     list_ip = ["4.2.2.2", "208.67.222.222"]
     for ip in list_ip:
         if ping_host(ip):
@@ -18,6 +22,10 @@ def is_online():
 
 
 def get_externalips():
+    """
+    retrieve our public IP
+    :return:
+    """
     if ping_host("myexternalip.com"):
         ip = get_http_page("http://myexternalip.com/raw")[0]
         if ip == "":
@@ -36,6 +44,11 @@ Dyndnsnic = "/nic/update"
 
 
 def sendtoovh(localip):
+    """
+    update ip on OVH severs
+    :param localip:
+    :return:
+    """
     if "." not in HOST:
         write_log("dynhost", "Bad hostname: " + HOST)
         return
@@ -94,6 +107,11 @@ def sendtoovh(localip):
 
 
 def main(dry_run: bool = False):
+    """
+    main script execution
+    :param dry_run: if the script should be run without system modification
+    :return:
+    """
     # test si la connexion internet existe
     write_log("dynhost", "starting dynhost update")
     if is_online():

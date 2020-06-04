@@ -1,12 +1,18 @@
 #!/usr/bin/env python
-
+"""
+weekly procedures (based on OpenBSD ones)
+"""
 from common.maintenance import *
 
 
 def locate_database():
+    """
+    update the locate database
+    :return:
+    """
     # /usr/libexec/locate.updatedb
     write_log("weekly", "Updating locate database")
-    lines = system_exec("/usr/libexec/locate.updatedb")
+    ret, lines = system_exec("/usr/libexec/locate.updatedb")
     if len(lines) != 0:
         # houston, we got a problem
         write_log("weekly", "problem in locate database update")
@@ -19,8 +25,12 @@ def locate_database():
 
 
 def check_packages():
+    """
+    check the package installation
+    :return:
+    """
     # now check packages
-    lines = system_exec("pkg_check -xq")
+    ret, lines = system_exec("pkg_check -xq")
     ok = True
     for line in lines:
         if "ok" not in line:
@@ -38,9 +48,13 @@ def check_packages():
 
 
 def whatis_database():
+    """
+    update the whatis database
+    :return:
+    """
     # /usr/sbin/makewhatis
     write_log("weekly", "whatis database update")
-    lines = system_exec("/usr/sbin/makewhatis")
+    ret, lines = system_exec("/usr/sbin/makewhatis")
     if len(lines) != 0:
         # il y a un probleme
         write_log("weekly", "problem in whatis database update")
@@ -53,9 +67,13 @@ def whatis_database():
 
 
 def login_account():
+    """
+    get login statistics (not really working)
+    :return:
+    """
     # ac -p | sort -nr -k 2
     write_log("weekly", "login time statistics")
-    lines = system_exec("ac -p | sort -nr -k 2")
+    ret, lines = system_exec("ac -p | sort -nr -k 2")
     add_mail("Login statistics\n====")
     add_mail("[VERBATIM]")
     for line in lines:
@@ -65,6 +83,11 @@ def login_account():
 
 
 def main(dry_run: bool = False):
+    """
+    main script execution
+    :param dry_run: if the script should be run without system modification
+    :return:
+    """
     write_log("weekly", "runing weekly procedure")
     #
     add_mail("WEEKLY procedure\n=====")

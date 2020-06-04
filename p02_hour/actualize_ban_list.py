@@ -1,8 +1,16 @@
 #!/usr/bin/env python
+"""
+script for ban list actualization
+"""
 from common.maintenance import *
 
 
 def main(dry_run: bool = False):
+    """
+    main script execution
+    :param dry_run: if the script should be run without system modification
+    :return:
+    """
     # variables
     server = "https://lists.blocklist.de/lists"
     testlist = "all.txt"

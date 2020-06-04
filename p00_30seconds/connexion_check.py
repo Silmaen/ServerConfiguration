@@ -68,6 +68,11 @@ def o2b(s):
 
 
 def main(dry_run: bool = False):
+    """
+    main script execution
+    :param dry_run: if the script should be run without system modification
+    :return:
+    """
     if os.path.exists(datastate):
         f = open(datastate, "r")
         lines = f.readlines()

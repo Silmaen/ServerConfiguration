@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # - encoding:utf8 -
+"""
+scrit for testing the possibility to upgrade the system
+"""
 
 from common.trafic_cst import *
 
@@ -7,13 +10,23 @@ base_repository = "https://ftp.openbsd.org/pub/OpenBSD/"
 
 
 def get_actual_version():
-    version = system_exec("uname -r")[0]
+    """
+    retreave te actual version number
+    :return: version
+    """
+    ret, version = system_exec("uname -r")
+    version = version[0]
     if "." not in version:
         return "0.0"
     return ".".join(version.split(".")[0:2])
 
 
 def increment_version(old_version):
+    """
+    determine the next version number
+    :param old_version: the starting version
+    :return: the version number incremented
+    """
     a, b = [int(i) for i in old_version.split(".")]
     if b < 9:
         b += 1
@@ -24,6 +37,11 @@ def increment_version(old_version):
 
 
 def main(dry_run: bool = False):
+    """
+    main script execution
+    :param dry_run: if the script should be run without system modification
+    :return:
+    """
     write_log("newversion_check", "Daily OpenBSD version Check" + ["", " dry"][dry_run])
     old_version = get_actual_version()
     new_version = increment_version(old_version).strip()

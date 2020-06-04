@@ -127,6 +127,11 @@ def backup_hosts(leases):
 
 
 def main(dry_run: bool = False):
+    """
+    main script execution
+    :param dry_run: if the script should be run without system modification
+    :return:
+    """
     leases = read_leases()
     if backup_hosts(leases):
         write_log("lslease", "Zone update required")

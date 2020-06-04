@@ -1,5 +1,7 @@
 #!/usr/bin/env python
-
+"""
+the daily procedure (coming from OpenBSD)
+"""
 from common.Connexion_DB import *
 import time
 import datetime
@@ -7,16 +9,24 @@ import shutil
 
 
 def setheaderlines():
+    """
+    get information about kernel version and uptime
+    :return: lines to be printed in mail
+    """
     res = []
     cmd = "sysctl -n kern.version"
-    lines = system_exec(cmd)
+    ret, lines = system_exec(cmd)
     res.append(lines[0])
-    lines = system_exec("uptime")
+    ret, lines = system_exec("uptime")
     res.append(lines[0])
     return res
 
 
 def remove_tmp():
+    """
+    clean the /tmp folder
+    :return:
+    """
     if not os.path.exists("/tmp"):
         return
     if os.path.islink("/tmp"):
@@ -43,6 +53,10 @@ def remove_tmp():
 
 
 def purge_account():
+    """
+    purge the account data
+    :return:
+    """
     if not os.path.exists("/var/account/acct"):
         return
     write_log("daily", "Purging accounting records")
@@ -56,7 +70,11 @@ def purge_account():
 
 
 def services():
-    lines = system_exec("rcctl ls failed")
+    """
+    check for service that are not runin
+    :return:
+    """
+    ret, lines = system_exec("rcctl ls failed")
     if len(lines) == 0:
         # everything is OK!
         return
@@ -70,7 +88,11 @@ def services():
 
 
 def disk():
-    lines = system_exec("df -hl")
+    """
+    check disk space
+    :return:
+    """
+    ret, lines = system_exec("df -hl")
     if len(lines) == 0:
         return
     write_log("daily", "Disks:")
@@ -91,7 +113,11 @@ MySQLParams = {
 
 
 def network():
-    lines = system_exec("netstat -ibhn")
+    """
+    compute network statistics
+    :return:
+    """
+    ret, lines = system_exec("netstat -ibhn")
     if len(lines) == 0:
         return
     write_log("daily", "Network:")
@@ -120,6 +146,11 @@ def network():
 
 
 def main(dry_run: bool = False):
+    """
+    main script execution
+    :param dry_run: if the script should be run without system modification
+    :return:
+    """
     write_log("daily", "runing daily procedure")
     #
     hlines = setheaderlines()

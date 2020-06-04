@@ -11,6 +11,11 @@ MySQLParams = {
 
 
 def main(dry_run: bool = False):
+    """
+    main script execution
+    :param dry_run: if the script should be run without system modification
+    :return:
+    """
     # to  lighten th log files... write_log("connexion_table","check connexion table")
     # initialize data and connect to mysql database
     db = MyDataBase(MySQLParams, "")
