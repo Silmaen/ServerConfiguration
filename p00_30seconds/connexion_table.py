@@ -16,15 +16,15 @@ def main(dry_run: bool = False):
     :param dry_run: if the script should be run without system modification
     :return:
     """
-    # to  lighten th log files... write_log("connexion_table","check connexion table")
+    # to  lighten th log files... logger.log("connexion_table","check connexion table")
     # initialize data and connect to mysql database
     db = MyDataBase(MySQLParams, "")
     if not db.db_connexion():
-        write_log("connexion_table", "No connexion to MySQL database!")
+        logger.log("connexion_table", "No connexion to MySQL database!")
         return
     # read database
     if not db.get_active_machine_list():
-        write_log("connexion_table", "MySQL database has no Active machine list")
+        logger.log("connexion_table", "MySQL database has no Active machine list")
         return
     # look for true connected machines
     db.get_connected_machines()

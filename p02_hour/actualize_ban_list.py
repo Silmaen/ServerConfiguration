@@ -17,10 +17,10 @@ def main(dry_run: bool = False):
     ban_ip_table = "ban_ip"
     ban_ip_file = "/etc/banlist"
     #
-    write_log("actualize_ban", "Actualization banlist from " + server + "/" + testlist)
+    logger.log("actualize_ban", "Actualization banlist from " + server + "/" + testlist)
     lines = get_http_page(server + "/" + testlist)
     if len(lines) == 0:
-        write_log("actualize_ban", "ERROR: no addess in received list")
+        logger.log("actualize_ban", "ERROR: no addess in received list")
         return
     if not dry_run:
         ffi = open(ban_ip_file, "w")
@@ -31,7 +31,7 @@ def main(dry_run: bool = False):
         cmd = "pfctl -t " + ban_ip_table + " -T replace -f /etc/banlist"
         ret, lines = system_exec(cmd, "actualize_ban", " banlist update")
         for line in lines:
-            write_log("actualize_ban", line)
+            logger.log("actualize_ban", line)
 
 
 if __name__ == "__main__":

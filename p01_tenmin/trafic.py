@@ -49,7 +49,7 @@ def main(dry_run: bool = False):
     :param dry_run: if the script should be run without system modification
     :return:
     """
-    write_log("trafic", "Traffic computation")
+    logger.log("trafic", "Traffic computation")
     old_interface = load()
     r_interface = get_traffic()
     if not dry_run:

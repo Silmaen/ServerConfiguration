@@ -11,11 +11,11 @@ def main(dry_run: bool = False):
     :param dry_run: if the script should be run without system modification
     :return:
     """
-    write_log("newsyslog", "runing newsyslog")
+    logger.log("newsyslog", "runing newsyslog")
     if not dry_run:
         ret, lines = system_exec("/usr/bin/newsyslog", "newsyslog", "newsyslog")
         for line in lines:
-            write_log("newsyslog", line)
+            logger.log("newsyslog", line)
 
 
 if __name__ == "__main__":

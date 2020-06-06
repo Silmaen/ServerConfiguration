@@ -11,9 +11,9 @@ def main(dry_run: bool = False):
     :return:
     """
     if dry_run:
-        write_log("Testing", "Main testing Procedure dry run")
+        logger.log("Testing", "Main testing Procedure dry run")
     else:
-        write_log("Testing", "Main testing Procedure")
+        logger.log("Testing", "Main testing Procedure")
 
 
 if __name__ == "__main__":

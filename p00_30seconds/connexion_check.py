@@ -88,7 +88,7 @@ def main(dry_run: bool = False):
             if wan_online(w):
                 state = True
         if state != wan[w]["state"]:
-            write_log("conn_chk", "wan " + w + " changed state from " + b2o(wan[w]["state"]) + " to " + b2o(state))
+            logger.log("conn_chk", "wan " + w + " changed state from " + b2o(wan[w]["state"]) + " to " + b2o(state))
             wan[w]["state"] = state
             if not dry_run:
                 if state:
