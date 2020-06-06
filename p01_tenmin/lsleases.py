@@ -15,7 +15,7 @@ def read_leases(filename=""):
     if filename == "":
         filename = os.path.join(default_lease_location, default_lease_file)
     if not os.path.exists(filename):
-        write_log("lslease", "ERROR: no lease files found at '" + filename + "'")
+        logger.log("lslease", "ERROR: no lease files found at '" + filename + "'")
         return {}
     ff = open(filename, "r")
     lines = ff.readlines()
@@ -53,7 +53,7 @@ def generate_zones(leases):
     has_all_template = True
     for lease in lease_list:
         if not os.path.exists(os.path.join(template_zones_location, lease + ".template")):
-            write_log("lslease", "ERROR: unable to find the template '" + os.path.join(template_zones_location, lease + ".template") + "'")
+            logger.log("lslease", "ERROR: unable to find the template '" + os.path.join(template_zones_location, lease + ".template") + "'")
             has_all_template = False
     if not has_all_template:
         return
@@ -134,12 +134,12 @@ def main(dry_run: bool = False):
     """
     leases = read_leases()
     if backup_hosts(leases):
-        write_log("lslease", "Zone update required")
+        logger.log("lslease", "Zone update required")
         if not dry_run:
             generate_zones(leases)
             system_exec("rcctl restart nsd unbound", "lslease")
     else:
-        write_log("lslease", "No zone update required")
+        logger.log("lslease", "No zone update required")
 
 
 if __name__ == "__main__":

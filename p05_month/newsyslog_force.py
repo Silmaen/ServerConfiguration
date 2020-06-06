@@ -10,15 +10,15 @@ def newsyslog_forced():
     monthly log rotate has to be forced
     :return:
     """
-    write_log("monthly", "newsyslog forced")
+    logger.log("monthly", "newsyslog forced")
     ret, lines = system_exec("/usr/bin/newsyslog -F")
     if len(lines) != 0:
         # il y a un probleme
-        write_log("monthly", "problem in newsyslog execution")
+        logger.log("monthly", "problem in newsyslog execution")
         add_mail("Problems in newsyslog execution\n====")
         add_mail("[VERBATIM]")
         for line in lines:
-            write_log("monthly", line)
+            logger.log("monthly", line)
             add_mail(line)
         add_mail("[/VERBATIM]")
 

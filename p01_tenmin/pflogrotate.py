@@ -13,7 +13,7 @@ def pflog_rotate():
     rotate pf log if size get too high
     :return:
     """
-    write_log("pflogrotate", "executiong pflog rotate")
+    logger.log("pflogrotate", "executiong pflog rotate")
     system_exec("pkill -ALRM -u root -U root -t - -x pflogd")
     if not os.path.exists(PFLOG):
         return

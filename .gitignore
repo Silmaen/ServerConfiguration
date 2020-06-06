@@ -11,3 +11,4 @@ data/hmail
 data/*.html
 *.out
 *.old
+/data/*.dat

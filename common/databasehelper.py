@@ -25,15 +25,15 @@ class DatabaseHelper:
         try:
             self.__con = MySQLdb.connect(**MySQLParams)
         except MySQLdb.Error as e:
-            write_log("DatabaseHelper", "MySQLdb Error " + str(e.args[0]) + ": " + str(e.args[1]))
+            logger.log("DatabaseHelper", "MySQLdb Error " + str(e.args[0]) + ": " + str(e.args[1]))
             self.__con = None
             self.__error_code = 1
         except:
-            write_log("DatabaseHelper", "Unknown Error during connexion!")
+            logger.log("DatabaseHelper", "Unknown Error during connexion!")
             self.__con = None
             self.__error_code = 2
         if not self.__con:
-            write_log("DatabaseHelper", "Connexion Error")
+            logger.log("DatabaseHelper", "Connexion Error")
             self.__error_code = 3
         self.__cur = self.__con.cursor()
         self.__error_code = 0
@@ -56,11 +56,11 @@ class DatabaseHelper:
             self.__cur.execute(request)
             self.__con.commit()
         except MySQLdb.Error as e:
-            write_log("DatabaseHelper", "MySQLdb Error " + str(e.args[0]) + ": " + str(e.args[1]))
+            logger.log("DatabaseHelper", "MySQLdb Error " + str(e.args[0]) + ": " + str(e.args[1]))
             self.__close_connection()
             return False
         except:
-            write_log("DatabaseHelper", "Unknown Error for querry: '" + str(request) + "'")
+            logger.log("DatabaseHelper", "Unknown Error for querry: '" + str(request) + "'")
             self.__close_connection()
             return False
         return True
@@ -73,13 +73,13 @@ class DatabaseHelper:
         :return: (request succes, list of row as dictionaries)
         """
         if tablename == "":
-            write_log("DatabaseHelper", "malformed select request, unable to get table name")
+            logger.log("DatabaseHelper", "malformed select request, unable to get table name")
             return False, []
         # get column name
         req = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = N'" + tablename + "'"
         ret = self.__request(req)
         if not ret:
-            write_log("DatabaseHelper", "Unable to get column names")
+            logger.log("DatabaseHelper", "Unable to get column names")
             return False, []
         col_names = [r[0] for r in self.__cur.fetchall()]
         req = "SELECT * FROM `" + tablename + "`"
@@ -87,6 +87,6 @@ class DatabaseHelper:
             req += " " + filters
         ret = self.__request(req)
         if not ret:
-            write_log("DatabaseHelper", "request error: '" + req + "'")
+            logger.log("DatabaseHelper", "request error: '" + req + "'")
             return False, []
         return True, [dict(zip(col_names, r)) for r in self.__cur.fetchall()]

@@ -31,7 +31,7 @@ def remove_tmp():
         return
     if os.path.islink("/tmp"):
         return
-    write_log("daily", "Removing scratch and junk files")
+    logger.log("daily", "Removing scratch and junk files")
     cwd = os.getcwd()
     os.chdir("/tmp")
     list_dir = os.listdir()
@@ -59,7 +59,7 @@ def purge_account():
     """
     if not os.path.exists("/var/account/acct"):
         return
-    write_log("daily", "Purging accounting records")
+    logger.log("daily", "Purging accounting records")
     if os.path.exists("/var/account/acct.2"):
         os.rename("/var/account/acct.2", "/var/account/acct.3")
     if os.path.exists("/var/account/acct.1"):
@@ -78,11 +78,11 @@ def services():
     if len(lines) == 0:
         # everything is OK!
         return
-    write_log("daily", "Services that should be running but aren't")
+    logger.log("daily", "Services that should be running but aren't")
     add_mail("Services that should be running but aren't\n====")
     add_mail("[VERBATIM]")
     for line in lines:
-        write_log("daily", line)
+        logger.log("daily", line)
         add_mail(line)
     add_mail("[/VERBATIM]")
 
@@ -95,11 +95,11 @@ def disk():
     ret, lines = system_exec("df -hl")
     if len(lines) == 0:
         return
-    write_log("daily", "Disks:")
+    logger.log("daily", "Disks:")
     add_mail("Disks\n====")
     add_mail("[VERBATIM]")
     for line in lines:
-        write_log("daily", line)
+        logger.log("daily", line)
         add_mail(line)
     add_mail("[/VERBATIM]")
 
@@ -120,27 +120,27 @@ def network():
     ret, lines = system_exec("netstat -ibhn")
     if len(lines) == 0:
         return
-    write_log("daily", "Network:")
+    logger.log("daily", "Network:")
     add_mail("Network\n====")
     add_mail("Statistics\n===")
     add_mail("[VERBATIM]")
     for line in lines:
-        write_log("daily", line)
+        logger.log("daily", line)
         add_mail(line)
     add_mail("[/VERBATIM]")
     ending = datetime.datetime.now()
     starting = ending - datetime.timedelta(days=1)
     DB = MyDataBase(MySQLParams, "ClientStatistic")
     if not DB.db_connexion():
-        write_log("ClientStatistics", "Unable to get the database")
+        logger.log("ClientStatistics", "Unable to get the database")
         return
     machine_list = DB.get_connexions_between(starting, ending)
     lines = print_machine_list_duration(machine_list)
-    write_log("daily", "Connected machines:")
+    logger.log("daily", "Connected machines:")
     add_mail("Connected machines\n===")
     add_mail("[VERBATIM]")
     for line in lines:
-        write_log("daily", line)
+        logger.log("daily", line)
         add_mail(line)
     add_mail("[/VERBATIM]")
 
@@ -151,7 +151,7 @@ def main(dry_run: bool = False):
     :param dry_run: if the script should be run without system modification
     :return:
     """
-    write_log("daily", "runing daily procedure")
+    logger.log("daily", "runing daily procedure")
     #
     hlines = setheaderlines()
     add_mail("DAILY procedure\n=====")

@@ -18,22 +18,22 @@ def main(dry_run: bool = False):
     :return:
     """
     if dry_run:
-        write_log("ClientStatistics", "Check for client stat dry run")
+        logger.log("ClientStatistics", "Check for client stat dry run")
     else:
-        write_log("ClientStatistics", "Check for client stat")
+        logger.log("ClientStatistics", "Check for client stat")
     ending = datetime.datetime.now()
     starting = ending - datetime.timedelta(days=1)
     db = MyDataBase(MySQLParams, "ClientStatistic")
     if not db.db_connexion():
-        write_log("ClientStatistics", "Unable to get the database")
+        logger.log("ClientStatistics", "Unable to get the database")
         return
     machine_list = db.get_connexions_between(starting, ending)
     lines = print_machine_list_duration(machine_list)
-    write_log("daily", "Connected machines:")
+    logger.log("daily", "Connected machines:")
     add_mail("Connected machines\n===")
     add_mail("[VERBATIM]")
     for line in lines:
-        write_log("daily", line)
+        logger.log("daily", line)
         add_mail(line)
     add_mail("[/VERBATIM]")
 

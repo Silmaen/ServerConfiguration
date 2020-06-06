@@ -3,7 +3,7 @@ definition of the class machine
 """
 import datetime
 from common.databasehelper import DatabaseHelper
-from common.maintenance import write_log
+from common.maintenance import logger
 
 timeFormat = "%Y-%m-%d %H:%M:%S"
 
@@ -179,7 +179,7 @@ def get_active_machine_db():
     db = DatabaseHelper()
     ret, machines = db.select("ActiveMachine")
     if not ret:
-        write_log("ActiveMachineDb", "Connexion problems")
+        logger.log("ActiveMachineDb", "Connexion problems")
         return []
     ret = []
     for m in machines:

@@ -54,20 +54,20 @@ class MyDataBase:
         try:
             self.__con = MySQLdb.connect(**self.params)
             #if len(self.script) > 0:
-            #    write_log(self.script, "Connection to data base established!")
+            #    logger.log(self.script, "Connection to data base established!")
             if not self.__con:
-                write_log(self.script, "Connexion Error")
+                logger.log(self.script, "Connexion Error")
                 self.__con = None
                 self.__cur = None
                 return False
             self.__cur = self.__con.cursor()
         except MySQLdb.Error as e:
-            write_log(self.script, "MySQLdb Error " + str(e.args[0]) + ": " + str(e.args[1]))
+            logger.log(self.script, "MySQLdb Error " + str(e.args[0]) + ": " + str(e.args[1]))
             self.__con = None
             self.__cur = None
             return False
         except:
-            write_log(self.script, "Unknown Error during connexion!")
+            logger.log(self.script, "Unknown Error during connexion!")
             self.__con = None
             self.__cur = None
             return False
@@ -87,17 +87,17 @@ class MyDataBase:
             self.__cur.execute(query)
             self.__con.commit()
         except MySQLdb.Error as e:
-            write_log(self.script, "MySQLdb Error " + str(e.args[0]) + ": " + str(e.args[1]))
+            logger.log(self.script, "MySQLdb Error " + str(e.args[0]) + ": " + str(e.args[1]))
             return False, {}
         except:
-            write_log(self.script, "Unknown Error for querry: '" + str(query) + "'")
+            logger.log(self.script, "Unknown Error for querry: '" + str(query) + "'")
             return False, {}
         return True, {r[0]: list(r[1:]) for r in self.__cur.fetchall()}
 
     def get_active_machine_list(self):
         res, rows = self.db_request("SELECT * FROM `ActiveMachine`")
         if not res:
-            write_log(self.script, "ERROR retrieving  Machine List")
+            logger.log(self.script, "ERROR retrieving  Machine List")
             return False
         self.DBMachines = {}
         for row in rows.values():
@@ -129,18 +129,18 @@ class MyDataBase:
             if mach not in self.ConnectedMachines.keys():
                 self.DisonnectedMachines[mach] = info
                 self.DisonnectedMachines[mach]["Stop"] = datetime.datetime.now()
-                write_log(self.script, 'machine ' + str(mach) + ' is now disconnected!')
+                logger.log(self.script, 'machine ' + str(mach) + ' is now disconnected!')
                 continue
             new_info = self.ConnectedMachines[mach]
             if new_info['IP'] != info['IP']:
-                write_log(self.script, 'machine ' + str(mach) + ' has changed IP')
+                logger.log(self.script, 'machine ' + str(mach) + ' has changed IP')
                 self.DisonnectedMachines[mach] = info
                 self.DisonnectedMachines[mach]["Stop"] = datetime.datetime.now()
                 self.ActualizedDBMachines[mach] = new_info
                 self.ActualizedDBMachines[mach]["tobeupdated"] = 1
                 continue
             if new_info['MAC'] != info['MAC']:
-                write_log(self.script, 'machine ' + str(mach) + ' has changed MAC')
+                logger.log(self.script, 'machine ' + str(mach) + ' has changed MAC')
                 self.DisonnectedMachines[mach] = info
                 self.DisonnectedMachines[mach]["Stop"] = datetime.datetime.now()
                 self.ActualizedDBMachines[mach] = new_info
@@ -151,13 +151,13 @@ class MyDataBase:
         for mach, info in self.ConnectedMachines.items():
             if mach in self.ActualizedDBMachines.keys():
                 continue  # already in data base
-            write_log(self.script, "New machine in data base: " + str(mach))
+            logger.log(self.script, "New machine in data base: " + str(mach))
             self.ActualizedDBMachines[mach] = info
             self.ActualizedDBMachines[mach]["tobeupdated"] = 1
 
     def bd_actualize(self):
         if not self.__cur:
-            write_log(self.script, "ERROR: unable to actialize DB without proper connection")
+            logger.log(self.script, "ERROR: unable to actialize DB without proper connection")
             return False
         # add entry in archives
         for mach, info in self.DisonnectedMachines.items():
@@ -176,12 +176,12 @@ class MyDataBase:
             # print(cmd)
             res, _ = self.db_request(cmd)
             if not res:
-                write_log(self.script, "ERROR adding entry to database, cmd=" + cmd)
+                logger.log(self.script, "ERROR adding entry to database, cmd=" + cmd)
                 return False
             cmd = "DELETE FROM `ActiveMachine` WHERE `ActiveMachine`.`MachineName` = '" + mach + "'"
             res, _ = self.db_request(cmd)
             if not res:
-                write_log(self.script, "ERROR removing entry to database, cmd=" + cmd)
+                logger.log(self.script, "ERROR removing entry to database, cmd=" + cmd)
                 return False
         # update active database
         for mach, info in self.ActualizedDBMachines.items():
@@ -200,7 +200,7 @@ class MyDataBase:
                 # print(cmd)
                 res, _ = self.db_request(cmd)
                 if not res:
-                    write_log(self.script, "ERROR updating entry in database, cmd=" + cmd)
+                    logger.log(self.script, "ERROR updating entry in database, cmd=" + cmd)
                     return False
             else:
                 # INSERT ...
@@ -215,7 +215,7 @@ class MyDataBase:
                 # print(cmd)
                 res, _ = self.db_request(cmd)
                 if not res:
-                    write_log(self.script, "ERROR adding entry to database, cmd=" + cmd)
+                    logger.log(self.script, "ERROR adding entry to database, cmd=" + cmd)
                     return False
         return True
 
