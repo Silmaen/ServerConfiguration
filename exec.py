@@ -143,12 +143,15 @@ def main():
     parser.add_argument("-v", "--verbose", action="count", help="Level of verbosity, default= 1", default=1)
     args = parser.parse_args()
 
+    # initialise the default logging system
+    logger = Logger(full_logfile, args.verbose)
+    
     if args.special:
         logger = Logger("console", args.verbose)
         run_special(args.dry_run)
         return
     if args.fast:
-        logger = Logger(full_logfile, level=args.verbose)
+        logger = Logger(full_logfile, args.verbose)
         run_30sec()
         return
     if args.mailing:
@@ -163,8 +166,6 @@ def main():
         mailing.main()
         logger.log("robot", "\n\n --- Done Dry run procedure for testing --- \n")
         return
-    # initialise the default logging system
-    logger = Logger(full_logfile, level=args.verbose)
     #
     # run maintenance procedures
     # 
