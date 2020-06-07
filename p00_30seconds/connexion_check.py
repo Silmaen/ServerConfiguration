@@ -21,6 +21,7 @@ valid_action = ["add", "delete"]
 
 
 def system_exec2(cmd: str):
+    import subprocess
     if cmd == "":
         return 1
     return subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True).returncode
