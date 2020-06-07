@@ -3,7 +3,6 @@ common helper functions
 """
 import os
 import time
-import subprocess
 import base64
 import http.client
 import urllib.parse
@@ -15,6 +14,50 @@ mail_file_txt = os.path.join(data_dir, "mail.txt")
 logger = Logger()
 
 ip_file = data_dir + "/old.ip"
+
+
+def system_exec(cmd: str, who: str = "", what: str = ""):
+    """
+    execute a system command
+    :param cmd: the command to run
+    :param who: who is trying to use the command
+    :param what: message that replace the full command in log in case of error
+    :return: (return code, output lines as list of string)
+    """
+    import subprocess
+    if cmd == "":
+        return -1, []
+    try:
+        p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+    except (ValueError, OSError) as err:
+        twho = who
+        if twho == "":
+            twho = "robot"
+        if what == "":
+            msg = "ERROR executing " + cmd
+        else:
+            msg = "ERROR executing " + what
+        logger.log(twho, msg, 0)
+        return -2, []
+    try:
+        enc = os.device_encoding(1)
+        if not enc:
+            enc = "ascii"
+        lines = p.stdout.decode(enc, errors='ignore').splitlines()
+    except:
+        return -3, []
+    return p.returncode, lines
+
+
+def is_system_production():
+    """
+    check if the system is runing in production mode
+    :return: True if the system is in installed directory
+    """
+    if local_path == "/var/maintenance":
+        return True
+    return False
+
 
 def get_last_ip():
     old_ip = "0.0.0.0"
@@ -53,31 +96,6 @@ def set_last_ip(new_ip):
     ffi = open(ip_file, 'w')
     ffi.write(new_ip.strip())
     ffi.close()
-
-
-def system_exec(cmd: str, who: str = "", what: str = ""):
-    if cmd == "":
-        return -1, []
-    try:
-        p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
-    except (ValueError, OSError) as err:
-        twho = who
-        if twho == "":
-            twho = "robot"
-        if what == "":
-            msg = "ERROR executing " + cmd
-        else:
-            msg = "ERROR executing " + what
-        logger.log(twho, msg)
-        return -2, []
-    try:
-        enc = os.device_encoding(1)
-        if not enc:
-            enc = "ascii"
-        lines = p.stdout.decode(enc).splitlines()
-    except:
-        return -3, []
-    return p.returncode, lines
 
 
 def ping_host(host):

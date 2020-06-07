@@ -10,6 +10,9 @@ tomorrow_date = the_date + datetime.timedelta(days=1)
 
 
 def run_30sec(dry_run: bool = False):
+    """
+    procedure run every 30 secnds
+    """
     if dry_run:
         logger.log("robot", "Dry run procedure for testing 30 seconds procedures")
     from p00_30seconds import connexion_check, connexion_table
@@ -18,6 +21,9 @@ def run_30sec(dry_run: bool = False):
 
 
 def run_10min(dry_run: bool = False):
+    """
+    procedure run every 10 minutes
+    """
     if dry_run:
         logger.log("robot", "Dry run procedure for testing 10 minutes procedures")
     else:
@@ -30,6 +36,9 @@ def run_10min(dry_run: bool = False):
 
 
 def run_hourly(dry_run: bool = False):
+    """
+    hourly procedures
+    """
     run_10min(dry_run)
     if dry_run:
         logger.log("robot", "Dry run procedure for testing hourly procedures")
@@ -41,6 +50,9 @@ def run_hourly(dry_run: bool = False):
 
 
 def run_daily(dry_run: bool = False):
+    """
+    daily procedure
+    """
     run_hourly(dry_run)
     if dry_run:
         logger.log("robot", "Dry run procedure for testing daily procedures")
@@ -53,6 +65,9 @@ def run_daily(dry_run: bool = False):
 
 
 def run_weekly(dry_run: bool = False):
+    """
+    weekly procedure
+    """
     run_daily(dry_run)
     if dry_run:
         logger.log("robot", "Dry run procedure for testing weekly procedures")
@@ -66,6 +81,9 @@ def run_weekly(dry_run: bool = False):
 
 
 def run_monthly(last: bool = False, dry_run: bool = False):
+    """
+    special monthly procedure
+    """
     if dry_run:
         logger.log("robot", "Dry run procedure for testing monthly procedures")
     else:
@@ -81,7 +99,8 @@ def run_monthly(last: bool = False, dry_run: bool = False):
         return  # already done
     if os.path.exists(full_logfile + "_year_" + str(the_date.year) + ".tgz"):
         return  # already done
-    cmd = "tar czf " + full_logfile + "_month_" + str(the_date.year) + "_" + str(the_date.month) + ".tgz " + logfile + ".log"
+    cmd = "tar czf " + full_logfile + "_month_" + str(the_date.year) + "_" + str(the_date.month) + ".tgz " + \
+          full_logfile + ".log"
     if dry_run:
         logger.log("monthly", "Packing dry")
         logger.log("monthly", ">>> " + cmd)
@@ -94,6 +113,9 @@ def run_monthly(last: bool = False, dry_run: bool = False):
 
 
 def run_yearly(dry_run: bool = False):
+    """
+    special yearly procedures
+    """
     run_monthly(True, dry_run)
     if dry_run:
         logger.log("robot", "Dry run procedure for testing yearly procedures")
@@ -122,6 +144,9 @@ def run_yearly(dry_run: bool = False):
 
 
 def run_special(dry_run: bool = False):
+    """
+    run the content of the special folder
+    """
     if dry_run:
         logger.log("robot", "Dry run procedure for testing special procedures")
     else:
@@ -129,6 +154,23 @@ def run_special(dry_run: bool = False):
     from p07_special import Testing, ClientStatistics
     Testing.main(dry_run)
     ClientStatistics.main(dry_run)
+
+
+def run_unit_tests():
+    """
+    run all unittests
+    """
+    import sys
+    logger.log("TestingSystem", "*-------------------------*")
+    logger.log("TestingSystem", "|    testing procedure    |")
+    logger.log("TestingSystem", "*-------------------------*")
+    test_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tests", "testingmain.py")
+    cmd = ["python3 ", "python "][sys.platform in ["Windows", "win32"]] + " -m unittest " + os.path.join(test_dir)
+    ret, lines = system_exec(cmd)
+    for line in lines:
+        logger.log("TestingSystem", line)
+    if ret != 0:
+        sys.exit(1)
 
 
 def main():
@@ -141,11 +183,17 @@ def main():
     parser.add_argument("-d", "--dry_run", action="store_true",
                         help="Run the script in dry-run mode for testing purpose")
     parser.add_argument("-v", "--verbose", action="count", help="Level of verbosity, default= 1", default=1)
+    parser.add_argument("-t", "--test_mode", action="store_true",
+                        help="Run the script in test mode to run the unit-tests")
     args = parser.parse_args()
 
     # initialise the default logging system
     logger = Logger(full_logfile, args.verbose)
     
+    if args.test_mode:
+        logger = Logger("console", 5)
+        run_unit_tests()
+        return
     if args.special:
         logger = Logger("console", args.verbose)
         run_special(args.dry_run)
