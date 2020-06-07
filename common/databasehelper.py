@@ -28,13 +28,16 @@ class DatabaseHelper:
             logger.log("DatabaseHelper", "MySQLdb Error " + str(e.args[0]) + ": " + str(e.args[1]))
             self.__con = None
             self.__error_code = 1
+            return
         except:
             logger.log("DatabaseHelper", "Unknown Error during connexion!")
             self.__con = None
             self.__error_code = 2
+            return
         if not self.__con:
             logger.log("DatabaseHelper", "Connexion Error")
             self.__error_code = 3
+            return
         self.__cur = self.__con.cursor()
         self.__error_code = 0
 
@@ -65,7 +68,7 @@ class DatabaseHelper:
             return False
         return True
 
-    def select(self, tablename: str, filters: str= ""):
+    def select(self, tablename: str, filters: str = ""):
         """
         do a select request to the database
         :param tablename: the table to use

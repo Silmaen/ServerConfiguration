@@ -12,14 +12,16 @@ def mac_compare(mac1: str, mac2: str):
     """
     compare 2 mac address (including mac changes through extender)
     :param mac1: first mac to compare
-    :param mac2: second mac to comapre
+    :param mac2: second mac to compare
     :return: True if the mac are equal (or equal trough extender mac translation)
     """
-    if mac1 == mac2:
+    m1 = mac1.lower()
+    m2 = mac2.lower()
+    if m1 == m2:
         return True
-    dmac1 = "02:0f:b5:" + mac1[9:]
-    dmac2 = "02:0f:b5:" + mac2[9:]
-    if dmac1 == dmac2:
+    dm1 = "02:0f:b5:" + m1[9:]
+    dm2 = "02:0f:b5:" + m2[9:]
+    if dm1 == m2 or dm2 == m1:
         return True
     return False
 
@@ -39,7 +41,7 @@ def str_is_ip(string: str):
     except:
         return False
     for i in items:
-        if i<0 or i>255:
+        if i < 0 or i > 255:
             return False
     return True
 

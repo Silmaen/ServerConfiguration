@@ -60,7 +60,7 @@ class Logger:
         else:
             pass  # nothing to do here
 
-    def log(self, message: str, who: str = "", level: int = 1):
+    def log(self, who: str, message: str, level: int = 1):
         """
         log the message to the destination
         :param message: the message to log as a string
