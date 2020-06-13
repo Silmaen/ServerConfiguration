@@ -151,9 +151,6 @@ def run_special(dry_run: bool = False):
         logger.log("robot", "Dry run procedure for testing special procedures")
     else:
         logger.log("exec", "run special procedures")
-    from p07_special import Testing, ClientStatistics
-    Testing.main(dry_run)
-    ClientStatistics.main(dry_run)
 
 
 def run_unit_tests():
