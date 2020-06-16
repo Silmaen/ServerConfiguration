@@ -108,7 +108,7 @@ MySQLParams = {
     'host': "localhost",
     'user': "robot",
     'passwd': "Robot123",
-    'db': "adiministration"
+    'db': "administration"
 }
 
 
