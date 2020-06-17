@@ -86,7 +86,8 @@ def get_http_page(url: str, user: str = "", password: str = ""):
         return []
     try:
         http_data = http_response.read().decode("ascii").splitlines()
-    except:
+    except Exception as err:
+        logger.log_error("getHttpPage", " problem during response dedoding: " + str(err))
         http_data = []
     if http_response.status == 200:
         return http_data
