@@ -20,7 +20,7 @@ class TestingDatabase(unittest.TestCase):
             self.assertTrue(good)
             self.assertTrue(len(results) > 0)
         else:
-            logger.log("TestingDatabase", "Warning: connexion not tested, because not in production", 0)
+            logger.log("TestingDatabase", "Warning: connexion not tested, because not in production", 1)
             self.assertTrue(True)
 
 

@@ -3,6 +3,7 @@
 the daily procedure (coming from OpenBSD)
 """
 from common.Connexion_DB import *
+from common.LoggingSystem import get_error_list
 import time
 import datetime
 import shutil
@@ -145,6 +146,19 @@ def network():
     add_mail("[/VERBATIM]")
 
 
+def check_daily_errors():
+    """
+    check for error in database
+    """
+    err_list = get_error_list()
+    add_mail("Error Status\n===")
+    if len(err_list) == 0:
+        add_mail("Everything is good!")
+    else:
+        for err in err_list:
+            add_mail(str(err))
+
+
 def main(dry_run: bool = False):
     """
     main script execution
@@ -165,6 +179,8 @@ def main(dry_run: bool = False):
         purge_account()
     #
     services()
+    #
+    check_daily_errors()
     #
     disk()
     #

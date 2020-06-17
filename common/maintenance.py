@@ -1,11 +1,7 @@
 """
 common helper functions
 """
-import os
 import time
-import base64
-import http.client
-import urllib.parse
 from common.AllDefaultParameters import *
 from common.LoggingSystem import Logger
 
@@ -37,7 +33,7 @@ def system_exec(cmd: str, who: str = "", what: str = ""):
             msg = "ERROR executing " + cmd
         else:
             msg = "ERROR executing " + what
-        logger.log(twho, msg, 0)
+        logger.log_error(twho, msg)
         return -2, []
     try:
         enc = os.device_encoding(1)
@@ -47,16 +43,6 @@ def system_exec(cmd: str, who: str = "", what: str = ""):
     except:
         return -3, []
     return p.returncode, lines
-
-
-def is_system_production():
-    """
-    check if the system is runing in production mode
-    :return: True if the system is in installed directory
-    """
-    if local_path == "/var/maintenance":
-        return True
-    return False
 
 
 def get_last_ip():
@@ -71,7 +57,7 @@ def get_last_ip():
 def set_last_ip(new_ip):
     items = new_ip.strip().split(".")
     if len(items) != 4:
-        logger.log("set_last_ip", "Wrong number of items in IP '" + str(new_ip) + "'")
+        logger.log_error("set_last_ip", "Wrong number of items in IP '" + str(new_ip) + "'")
         return
     try:
         p1 = int(items[0])
@@ -79,19 +65,19 @@ def set_last_ip(new_ip):
         p3 = int(items[2])
         p4 = int(items[3])
     except:
-        logger.log("set_last_ip", "Wrong number format in IP '" + str(new_ip) + "'")
+        logger.log_error("set_last_ip", "Wrong number format in IP '" + str(new_ip) + "'")
         return
     if p1 < 0 or 255 < p1:
-        logger.log("set_last_ip", "Wrong number value in IP '" + str(new_ip) + "'")
+        logger.log_error("set_last_ip", "Wrong number value in IP '" + str(new_ip) + "'")
         return
     if p2 < 0 or 255 < p2:
-        logger.log("set_last_ip", "Wrong number value in IP '" + str(new_ip) + "'")
+        logger.log_error("set_last_ip", "Wrong number value in IP '" + str(new_ip) + "'")
         return
     if p3 < 0 or 255 < p3:
-        logger.log("set_last_ip", "Wrong number value in IP '" + str(new_ip) + "'")
+        logger.log_error("set_last_ip", "Wrong number value in IP '" + str(new_ip) + "'")
         return
     if p4 < 0 or 255 < p4:
-        logger.log("set_last_ip", "Wrong number value in IP '" + str(new_ip) + "'")
+        logger.log_error("set_last_ip", "Wrong number value in IP '" + str(new_ip) + "'")
         return
     ffi = open(ip_file, 'w')
     ffi.write(new_ip.strip())
@@ -114,7 +100,7 @@ def ping_host(host):
         nb_tran = int(items[0].strip().split()[0])
         nb_received = int(items[1].strip().split()[0])
     except:
-        logger.log("ping_host", "ERROR in results" + str(items))
+        logger.log_error("ping_host", "ERROR in results" + str(items))
         return False
     if nb_tran == nb_received:
         return True
@@ -129,57 +115,6 @@ def get_host_ip(host):
     if "(" not in lines[0] or ")" not in lines[0]:
         return "0.0.0.0"
     return lines[0].split("(", 1)[-1].split(")", 1)[0]
-
-
-def get_http_response(url: str, user: str = "", password: str = ""):
-    valid_type = ["http", "https"]
-    if "://" not in url:
-        url = "http://" + url
-    dec = urllib.parse.urlparse(url)
-    if "." not in dec.netloc:
-        logger.log("exist_http_page", "Bad hostname: " + dec.netloc)
-        return False
-    try:
-        if dec.scheme == "http":
-            h2 = http.client.HTTPConnection(dec.netloc, timeout=50)
-        elif dec.scheme == "https":
-            h2 = http.client.HTTPSConnection(dec.netloc, timeout=50)
-        else:
-            logger.log("exist_http_page", "unsupported dec.scheme: '" + dec.scheme + "' valid type: " + str(valid_type))
-            return False
-    except TimeoutError as err:
-        logger.log("exist_http_page", "Error: Request to: " + str(dec.netloc) + " has timed out!!")
-        return False
-    request = dec.path
-    if dec.query != "":
-        request += "?" + dec.query
-    h2.putrequest("GET", request)
-    if user != "":
-        auth_str = user + ":" + password
-        auth_string = base64.b64encode(auth_str.encode("ascii")).decode("ascii").replace('\n', '')
-        h2.putheader("AUTHORIZATION", "Basic " + auth_string)
-    h2.endheaders()
-    return h2.getresponse()
-
-
-def exist_http_page(url: str, user: str = "", password: str = ""):
-    http_response = get_http_response(url, user, password)
-    if http_response.status == 200:
-        return True
-    else:
-        return False
-
-
-def get_http_page(url: str, user: str = "", password: str = ""):
-    http_response = get_http_response(url, user, password)
-    try:
-        http_data = http_response.read().decode("ascii").splitlines()
-    except:
-        http_data = []
-    if http_response.status == 200:
-        return http_data
-    logger.log("getHttpPage", "ERROR " + str(http_response.status) + " : " + str(http_response.reason))
-    return http_data
 
 
 def add_mail(message):

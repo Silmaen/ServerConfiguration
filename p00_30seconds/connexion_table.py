@@ -20,11 +20,11 @@ def main(dry_run: bool = False):
     # initialize data and connect to mysql database
     db = MyDataBase(MySQLParams, "")
     if not db.db_connexion():
-        logger.log("connexion_table", "No connexion to MySQL database!")
+        logger.log_error("connexion_table", "No connexion to MySQL database!")
         return
     # read database
     if not db.get_active_machine_list():
-        logger.log("connexion_table", "MySQL database has no Active machine list")
+        logger.log_error("connexion_table", "MySQL database has no Active machine list")
         return
     # look for true connected machines
     db.get_connected_machines()

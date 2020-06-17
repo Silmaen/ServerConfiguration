@@ -2,7 +2,7 @@
 testing relative to the connected machines
 """
 import unittest
-from common.machine import Machine, mac_compare, str_is_ip
+from common.machine import Machine, mac_compare, str_is_ip,str_is_mac
 import datetime
 
 
@@ -51,6 +51,15 @@ class TestingSingleMachine(unittest.TestCase):
         self.assertFalse(str_is_ip("192.168..15"))
         self.assertFalse(str_is_ip("192.168.toto.15"))
         self.assertFalse(str_is_ip("argawaen.net"))
+
+    def test_is_mac(self):
+        self.assertTrue(str_is_mac("00:00:00:00:00:00"))
+        self.assertTrue(str_is_mac("02:0f:b5:00:00:00"))
+        self.assertTrue(str_is_mac("02:0F:B5:00:0E:EE"))
+        self.assertTrue(str_is_mac("18:85:00:00:0e:ee"))
+        self.assertFalse(str_is_mac("18:8g:00:00:0e:ee"))
+        self.assertFalse(str_is_mac("18:8g:00:040:0e:ee"))
+        self.assertFalse(str_is_mac("18:8g:00;040:0e:ee"))
 
 
 if __name__ == '__main__':

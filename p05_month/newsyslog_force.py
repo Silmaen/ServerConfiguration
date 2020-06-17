@@ -14,7 +14,7 @@ def newsyslog_forced():
     ret, lines = system_exec("/usr/bin/newsyslog -F")
     if len(lines) != 0:
         # il y a un probleme
-        logger.log("monthly", "problem in newsyslog execution")
+        logger.log_error("monthly", "problem in newsyslog execution")
         add_mail("Problems in newsyslog execution\n====")
         add_mail("[VERBATIM]")
         for line in lines:

@@ -1,6 +1,10 @@
 #!/usr/bin/env python
-
-from common.maintenance import *
+"""
+trafic constants
+"""
+import os
+from common.AllDefaultParameters import *
+from common.maintenance import system_exec, logger
 
 traffic_file = os.path.join(data_dir, "traffic.txt")
 traffic_file_day = os.path.join(data_dir, "traffic_day.txt")
@@ -33,7 +37,7 @@ def line_word(string_to_split):
 def get_traffic():
     ret, results = system_exec("netstat -nlib")
     if len(results) < 1:
-        logger.log("get_traffic", "ERROR while retrieving traffic")
+        logger.log_error("get_traffic", "ERROR while retrieving traffic")
     res_interface = {}
     for line in results:
         if "<Link>" not in line:
@@ -83,21 +87,26 @@ def load_result():
 
 
 def byte_human(bytes_size):
+    """
+    transform byte size into human readable format
+    :param bytes_size: the size in byte
+    :return: return a string with units
+    """
     unit = ""
     val = bytes_size
     if val > 1024:
-        val = val / 1024.0
+        val /= 1024.0
         unit = "kB"
     if val > 1024:
-        val = val / 1024.0
+        val /= 1024.0
         unit = "MB"
     if val > 1024:
-        val = val / 1024.0
+        val /= 1024.0
         unit = "GB"
     if val > 1024:
-        val = val / 1024.0
+        val /= 1024.0
         unit = "TB"
     if val > 1024:
-        val = val / 1024.0
+        val /= 1024.0
         unit = "PB"
     return "{:3.1f}".format(val) + unit
