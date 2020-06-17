@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from common.maintenance import *
+from common.httputils import get_http_page
 
 HOST = "srv.argawaen.net"
 LOGIN = "argawaen.net-srvcom"
@@ -50,7 +51,7 @@ def sendtoovh(localip):
     :return:
     """
     if "." not in HOST:
-        logger.log("dynhost", "Bad hostname: " + HOST)
+        logger.log_error("dynhost", "Bad hostname: " + HOST)
         return
     #
     # build the query strings
@@ -62,19 +63,19 @@ def sendtoovh(localip):
     #
     url = "https://" + Dyndnshost + updateprefix + HOST + updatesuffix
     if not ping_host(Dyndnshost):
-        logger.log("dynhost", "ERROR: " + Dyndnshost + " is offline")
+        logger.log_error("dynhost", "ERROR: " + Dyndnshost + " is offline")
         return
     httpdata = get_http_page(url, LOGIN, PASSWORD)
     if len(httpdata) == 0:
-        logger.log("dynhost", "ERROR: No results")
+        logger.log_error("dynhost", "ERROR: No results")
         return
     #
     # badsys must begin the resulting text and hresponse.status is 200
     if httpdata[0].startswith("badsys"):
-        logger.log("dynhost", "Bad system parameter specified (not dyndns or statdns).")
+        logger.log_error("dynhost", "Bad system parameter specified (not dyndns or statdns).")
     # badagent must begin the resulting text and hresponse.status is 200
     elif httpdata[0].startswith("badagent"):
-        logger.log("dynhost", "Badagent contact author at kal@users.sourceforge.net.")
+        logger.log_error("dynhost", "Badagent contact author at kal@users.sourceforge.net.")
     else:
         # build the results list
         results = []
@@ -91,19 +92,19 @@ def sendtoovh(localip):
         elif lines.startswith("nochg"):
             logger.log("dynhost", HOST + " " + lines + " -consider abusive")
         elif lines.startswith("abuse"):
-            logger.log("dynhost", HOST + " " + lines + " -hostname blocked for abuse")
+            logger.log_error("dynhost", HOST + " " + lines + " -hostname blocked for abuse")
         elif lines.startswith("notfqdn"):
             logger.log("dynhost", HOST + " " + lines + " -FQDN hostnames needed")
         elif lines.startswith("nohost"):
-            logger.log("dynhost", HOST + " " + lines + " -hostname not found")
+            logger.log_error("dynhost", HOST + " " + lines + " -hostname not found")
         elif lines.startswith("!yours"):
-            logger.log("dynhost", HOST + " " + lines + " -hostname not yours")
+            logger.log_error("dynhost", HOST + " " + lines + " -hostname not yours")
         elif lines.startswith("numhost"):
-            logger.log("dynhost", HOST + " " + lines + " -send ipcheck.html to support@dyndns.org")
+            logger.log_error("dynhost", HOST + " " + lines + " -send ipcheck.html to support@dyndns.org")
         elif lines.startswith("dnserr"):
-            logger.log("dynhost", HOST + " " + lines + " -send ipcheck.html to support@dyndns.org")
+            logger.log_error("dynhost", HOST + " " + lines + " -send ipcheck.html to support@dyndns.org")
         else:
-            logger.log("dynhost", HOST + " " + lines + " -unknown result line")
+            logger.log_error("dynhost", HOST + " " + lines + " -unknown result line")
 
 
 def main(dry_run: bool = False):
@@ -126,7 +127,7 @@ def main(dry_run: bool = False):
             else:
                 logger.log("dynhost", "No IP changes, no update needed")
         else:
-            logger.log("dynhost", "ERROR: unable to retrieve public IP")
+            logger.log_error("dynhost", "ERROR: unable to retrieve public IP")
             add_mail("DYNHOST\n====")
             add_mail("ERROR while finding public IP")
     else:

@@ -57,7 +57,7 @@ def whatis_database():
     ret, lines = system_exec("/usr/sbin/makewhatis")
     if len(lines) != 0:
         # il y a un probleme
-        logger.log("weekly", "problem in whatis database update")
+        logger.log_error("weekly", "problem in whatis database update")
         add_mail("Problems in whatis database reconstruction\n====")
         add_mail("[VERBATIM]")
         for line in lines:

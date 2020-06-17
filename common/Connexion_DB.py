@@ -56,18 +56,18 @@ class MyDataBase:
             #if len(self.script) > 0:
             #    logger.log(self.script, "Connection to data base established!")
             if not self.__con:
-                logger.log(self.script, "Connexion Error")
+                logger.log_error(self.script, "Connexion Error")
                 self.__con = None
                 self.__cur = None
                 return False
             self.__cur = self.__con.cursor()
         except MySQLdb.Error as e:
-            logger.log(self.script, "MySQLdb Error " + str(e.args[0]) + ": " + str(e.args[1]))
+            logger.log_error(self.script, "MySQLdb Error " + str(e.args[0]) + ": " + str(e.args[1]))
             self.__con = None
             self.__cur = None
             return False
         except:
-            logger.log(self.script, "Unknown Error during connexion!")
+            logger.log_error(self.script, "Unknown Error during connexion!")
             self.__con = None
             self.__cur = None
             return False
@@ -87,17 +87,17 @@ class MyDataBase:
             self.__cur.execute(query)
             self.__con.commit()
         except MySQLdb.Error as e:
-            logger.log(self.script, "MySQLdb Error " + str(e.args[0]) + ": " + str(e.args[1]))
+            logger.log_error(self.script, "MySQLdb Error " + str(e.args[0]) + ": " + str(e.args[1]))
             return False, {}
         except:
-            logger.log(self.script, "Unknown Error for querry: '" + str(query) + "'")
+            logger.log_error(self.script, "Unknown Error for querry: '" + str(query) + "'")
             return False, {}
         return True, {r[0]: list(r[1:]) for r in self.__cur.fetchall()}
 
     def get_active_machine_list(self):
         res, rows = self.db_request("SELECT * FROM `ActiveMachine`")
         if not res:
-            logger.log(self.script, "ERROR retrieving  Machine List")
+            logger.log_error(self.script, "ERROR retrieving  Machine List")
             return False
         self.DBMachines = {}
         for row in rows.values():
@@ -157,7 +157,7 @@ class MyDataBase:
 
     def bd_actualize(self):
         if not self.__cur:
-            logger.log(self.script, "ERROR: unable to actialize DB without proper connection")
+            logger.log_error(self.script, "ERROR: unable to actialize DB without proper connection")
             return False
         # add entry in archives
         for mach, info in self.DisonnectedMachines.items():
@@ -176,12 +176,12 @@ class MyDataBase:
             # print(cmd)
             res, _ = self.db_request(cmd)
             if not res:
-                logger.log(self.script, "ERROR adding entry to database, cmd=" + cmd)
+                logger.log_error(self.script, "ERROR adding entry to database, cmd=" + cmd)
                 return False
             cmd = "DELETE FROM `ActiveMachine` WHERE `ActiveMachine`.`MachineName` = '" + mach + "'"
             res, _ = self.db_request(cmd)
             if not res:
-                logger.log(self.script, "ERROR removing entry to database, cmd=" + cmd)
+                logger.log_error(self.script, "ERROR removing entry to database, cmd=" + cmd)
                 return False
         # update active database
         for mach, info in self.ActualizedDBMachines.items():
@@ -200,7 +200,7 @@ class MyDataBase:
                 # print(cmd)
                 res, _ = self.db_request(cmd)
                 if not res:
-                    logger.log(self.script, "ERROR updating entry in database, cmd=" + cmd)
+                    logger.log_error(self.script, "ERROR updating entry in database, cmd=" + cmd)
                     return False
             else:
                 # INSERT ...
@@ -215,7 +215,7 @@ class MyDataBase:
                 # print(cmd)
                 res, _ = self.db_request(cmd)
                 if not res:
-                    logger.log(self.script, "ERROR adding entry to database, cmd=" + cmd)
+                    logger.log_error(self.script, "ERROR adding entry to database, cmd=" + cmd)
                     return False
         return True
 

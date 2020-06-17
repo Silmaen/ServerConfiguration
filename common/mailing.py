@@ -104,20 +104,20 @@ def sendmail(local_mail_file, local_mailing_list):
             break
     if not temp_pb:
         # this is a true problem
-        logger.log("mailing", "Mail sending problem:")
+        logger.log_error("mailing", "Mail sending problem:")
         for line in lines:
             logger.log("mailing", line)
         return False
     # attempt to restart smtpd:
     if not restart_smtpd():
         # error during restart
-        logger.log("mailing", "ERROR: unable to restart smtpd")
+        logger.log_error("mailing", "ERROR: unable to restart smtpd")
         return False
     # resend message
     ret, lines = system_exec("cat " + local_mail_file + " | sendmail " + local_mailing_list)
     if len(lines) == 0:
         return True
-    logger.log("mailing", "Mail sending problem:")
+    logger.log_error("mailing", "Mail sending problem:")
     for line in lines:
         logger.log("mailing", line)
     return False
@@ -127,7 +127,7 @@ def main(cleanup: bool = True, formatted: bool = False):
     #
     if not os.path.exists(mail_file_txt):
         if not cleanup:
-            logger.log("mailing", "no mail file named:" + mail_file_txt)
+            logger.log_error("mailing", "no mail file named:" + mail_file_txt)
         return
     #
     logger.log("mailing", "Mail need to be sent")

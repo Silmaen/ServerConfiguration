@@ -3,7 +3,7 @@ definition of the class machine
 """
 import datetime
 from common.databasehelper import DatabaseHelper
-from common.maintenance import logger
+from common.maintenance import logger, system_exec
 
 timeFormat = "%Y-%m-%d %H:%M:%S"
 
@@ -44,6 +44,16 @@ def str_is_ip(string: str):
         if i < 0 or i > 255:
             return False
     return True
+
+
+def str_is_mac(string: str):
+    """
+    determine if a string is a mac adress
+    :param string: the string to test
+    :return: True if the string correspond to a MAC address
+    """
+    import re
+    return re.match("[0-9a-f]{2}([-:]?)[0-9a-f]{2}(\\1[0-9a-f]{2}){4}$", string.lower())
 
 
 def find_in_lease(ip: str, mac: str):
@@ -181,11 +191,33 @@ def get_active_machine_db():
     db = DatabaseHelper()
     ret, machines = db.select("ActiveMachine")
     if not ret:
-        logger.log("ActiveMachineDb", "Connexion problems")
+        logger.log_error("ActiveMachineDb", "Connexion problems", 0)
         return []
     ret = []
     for m in machines:
         mm = Machine(m["MachineName"], m["MAC Address"], m["IP"], m["OutMachine"], m["ConnexionStart"])
         mm.inDB = True
         ret.append(mm)
+    return ret
+
+
+def get_connected_machines():
+    """
+    get the actual list of connected machines
+    :return: list of machine connected
+    """
+    ret, lines = system_exec("arp -an")
+    if ret != 0:
+        logger.log_error("Machine", "unable to find connected machine", 0)
+        return []
+    ret = []
+    for line in lines:
+        if line.startswith("Host"):
+            continue
+        items = line.split(" ")
+        if not str_is_mac(items[1]):  # fake connection
+            continue
+        mach = Machine(ip=items[0], mac=items[1], outmachine=(items[2] == "re0"))
+        mach.retrieve_name_from_ip()
+        ret.append(mach)
     return ret

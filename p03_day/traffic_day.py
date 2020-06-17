@@ -3,6 +3,7 @@
 script to determine the daily network trafic
 """
 from common.trafic_cst import *
+from common.maintenance import add_mail
 
 
 def main(dry_run: bool = False):
