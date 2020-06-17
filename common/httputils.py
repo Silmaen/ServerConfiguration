@@ -42,9 +42,7 @@ def get_http_response(url: str, user: str = "", password: str = ""):
             auth_string = base64.b64encode(auth_str.encode("ascii")).decode("ascii").replace('\n', '')
             h2.putheader("AUTHORIZATION", "Basic " + auth_string)
         h2.endheaders()
-        rep = h2.getresponse()
-        h2.close()
-        return True, rep
+        return True, h2
     except TimeoutError as err:
         logger.log_error("get_http_response", "Error: Request to: " + str(dec.netloc) + " has timed out!!")
         return False, None
@@ -64,13 +62,12 @@ def exist_http_page(url: str, user: str = "", password: str = ""):
     :param password: the password associated with the user
     :return: True if the page exist and is accessible
     """
-    res, http_response = get_http_response(url, user, password)
-    if not res:
-        return False
-    if http_response.status == 200:
-        return True
-    else:
-        return False
+    res, h2 = get_http_response(url, user, password)
+    rep = False
+    if res:
+        rep = h2.getresponse().status == 200
+        h2.close()
+    return rep
 
 
 def get_http_page(url: str, user: str = "", password: str = ""):
@@ -81,16 +78,18 @@ def get_http_page(url: str, user: str = "", password: str = ""):
     :param password: the password associated with the user
     :return: the content of the page
     """
-    res, http_response = get_http_response(url, user, password)
+    res, h2 = get_http_response(url, user, password)
+    http_response = h2.getresponse()
     if not res:
+        logger.log_error("getHttpPage", " problem code: ")
         return []
     try:
         http_data = http_response.read().decode("ascii").splitlines()
     except Exception as err:
         logger.log_error("getHttpPage", " problem during response dedoding: " + str(err))
         http_data = []
-    if http_response.status == 200:
-        return http_data
-    logger.log_error("getHttpPage", "ERROR " + str(http_response.status) + " : " + str(http_response.reason))
+    if http_response.status != 200:
+        logger.log_error("getHttpPage", "ERROR " + str(http_response.status) + " : " + str(http_response.reason))
+    h2.close()
     return http_data
 

@@ -154,8 +154,9 @@ class Logger:
         :param message: the error message
         """
         self.log(who, message, 0)
-        error = ErrorData(who, message)
-        error.add_to_database()
+        if is_system_production():
+            error = ErrorData(who, message)
+            error.add_to_database()
 
 
 def get_error_list(start_time:datetime.datetime = datetime.datetime.now(), end_time:datetime.datetime = datetime.datetime.now()):
