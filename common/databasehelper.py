@@ -42,7 +42,7 @@ def log_error(message: str):
         f = open(database_error_file, "w")
     else:
         f = open(database_error_file, "a")
-    f.write(str(datetime.now()) + " DB ERROR: " + message)
+    f.write(str(datetime.now()) + " DB ERROR: " + message + '\n')
     f.close()
 
 
