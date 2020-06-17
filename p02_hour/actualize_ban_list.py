@@ -21,7 +21,7 @@ def main(dry_run: bool = False):
     logger.log("actualize_ban", "Actualization banlist from " + server + "/" + testlist)
     lines = get_http_page(server + "/" + testlist)
     if len(lines) == 0:
-        logger.log_error("actualize_ban", "ERROR: no addess in received list")
+        logger.log_error("actualize_ban", "no address in received list")
         return
     if not dry_run:
         ffi = open(ban_ip_file, "w")

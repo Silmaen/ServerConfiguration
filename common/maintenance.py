@@ -55,29 +55,8 @@ def get_last_ip():
 
 
 def set_last_ip(new_ip):
-    items = new_ip.strip().split(".")
-    if len(items) != 4:
-        logger.log_error("set_last_ip", "Wrong number of items in IP '" + str(new_ip) + "'")
-        return
-    try:
-        p1 = int(items[0])
-        p2 = int(items[1])
-        p3 = int(items[2])
-        p4 = int(items[3])
-    except:
-        logger.log_error("set_last_ip", "Wrong number format in IP '" + str(new_ip) + "'")
-        return
-    if p1 < 0 or 255 < p1:
-        logger.log_error("set_last_ip", "Wrong number value in IP '" + str(new_ip) + "'")
-        return
-    if p2 < 0 or 255 < p2:
-        logger.log_error("set_last_ip", "Wrong number value in IP '" + str(new_ip) + "'")
-        return
-    if p3 < 0 or 255 < p3:
-        logger.log_error("set_last_ip", "Wrong number value in IP '" + str(new_ip) + "'")
-        return
-    if p4 < 0 or 255 < p4:
-        logger.log_error("set_last_ip", "Wrong number value in IP '" + str(new_ip) + "'")
+    from common.machine import str_is_ip
+    if not str_is_ip(new_ip):
         return
     ffi = open(ip_file, 'w')
     ffi.write(new_ip.strip())

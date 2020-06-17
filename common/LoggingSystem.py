@@ -159,7 +159,8 @@ class Logger:
             error.add_to_database()
 
 
-def get_error_list(start_time:datetime.datetime = datetime.datetime.now(), end_time:datetime.datetime = datetime.datetime.now()):
+def get_error_list(start_time: datetime.datetime = datetime.datetime.now(),
+                   end_time: datetime.datetime = datetime.datetime.now()):
     """
     get a list of error between 2 dates
     :param start_time: lower date

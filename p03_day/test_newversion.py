@@ -54,7 +54,7 @@ def main(dry_run: bool = False):
         # logger.log("newversion_check"," check at: '"+urlnew+"'")
     url_new = base_repository + old_version + "/"
     if not exist_http_page(url_new):
-        logger.log_error("newversion_check", "WARNING: actual OpenBSD version no more supported")
+        logger.log_error("newversion_check", "Actual OpenBSD version no more supported")
         add_mail("WARNING: actual OpenBSD version no more supported ")
     else:
         logger.log("newversion_check", "Actual OpenBSD version still available!")
