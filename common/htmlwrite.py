@@ -318,14 +318,14 @@ class htmlfile:
         oline = line
         for key in self.__keywordcolor.keys():
             if key in oline:
-                str(oline).replace(key, +"<font color=\"" + self.__keywordcolor[key] + ">" + key + "</font>")
+                str(oline).replace(key, "<font color=\"" + self.__keywordcolor[key] + ">" + key + "</font>")
             if not case:
                 if key.upper() in oline:
                     str(oline).replace(key.upper(),
-                                       +"<font color=\"" + self.__keywordcolor[key] + ">" + key.upper() + "</font>")
+                                       "<font color=\"" + self.__keywordcolor[key] + ">" + key.upper() + "</font>")
                 if key.lower() in oline:
                     str(oline).replace(key.lower(),
-                                       +"<font color=\"" + self.__keywordcolor[key] + ">" + key.lower() + "</font>")
+                                       "<font color=\"" + self.__keywordcolor[key] + ">" + key.lower() + "</font>")
         return oline
     #
     #
