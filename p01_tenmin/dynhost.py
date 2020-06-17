@@ -28,7 +28,12 @@ def get_externalips():
     :return:
     """
     if ping_host("myexternalip.com"):
-        ip = get_http_page("http://myexternalip.com/raw")[0]
+        lines = get_http_page("http://myexternalip.com/raw")
+        if len(lines) == 0:
+            logger.log_error("get_externalips", "Empty Response")
+            ip = ""
+        else:
+            ip = lines[0]
         if ip == "":
             return "0.0.0.0", "0.0.0.0"
         if "." not in ip:
