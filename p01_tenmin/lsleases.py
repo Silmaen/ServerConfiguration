@@ -15,7 +15,7 @@ def read_leases(filename=""):
     if filename == "":
         filename = os.path.join(default_lease_location, default_lease_file)
     if not os.path.exists(filename):
-        logger.log_error("lslease", "ERROR: no lease files found at '" + filename + "'")
+        logger.log_error("lslease", "no lease files found at '" + filename + "'")
         return {}
     ff = open(filename, "r")
     lines = ff.readlines()
@@ -53,7 +53,7 @@ def generate_zones(leases):
     has_all_template = True
     for lease in lease_list:
         if not os.path.exists(os.path.join(template_zones_location, lease + ".template")):
-            logger.log_error("lslease", "ERROR: unable to find the template '" + os.path.join(template_zones_location, lease + ".template") + "'")
+            logger.log_error("lslease", "unable to find the template '" + os.path.join(template_zones_location, lease + ".template") + "'")
             has_all_template = False
     if not has_all_template:
         return

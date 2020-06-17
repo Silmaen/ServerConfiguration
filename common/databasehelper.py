@@ -6,25 +6,24 @@ import MySQLdb
 
 if is_system_production():
     MySQLParams = {
-        'host': "localhost",
-        'user': "robot",
+        'host'  : "localhost",
+        'user'  : "robot",
         'passwd': "Robot123",
-        'db': "administration"
+        'db'    : "administration"
     }
 else:
     MySQLParams = {
-        'host': "localhost",
-        'user': "robot",
+        'host'  : "localhost",
+        'user'  : "robot",
         'passwd': "Robot123",
-        'db': "administration_test"
+        'db'    : "administration_test"
     }
 
 Valid_Tables = [
-    "ActiveMachine",     # the currently connected machines that are in the database
-    "ErrorList",         # list of errors
+    "ActiveMachine",  # the currently connected machines that are in the database
+    "ErrorList",  # list of errors
     "ConnexionArchive",  # archive of connected machine
 ]
-
 
 database_error_file = os.path.join(log_dir, "db_errors.log")
 
@@ -50,6 +49,7 @@ class DatabaseHelper:
     """
     class to handle database and communication with it
     """
+
     def __init__(self):
         self.__con = None
         self.__cur = None
@@ -69,7 +69,7 @@ class DatabaseHelper:
             self.__error_code = 2
             return
         if not self.__con:
-            log_error("Unknwon error during connexion")
+            log_error("Unknown error during connexion")
             self.__error_code = 3
             return
         self.__cur = self.__con.cursor()
@@ -97,7 +97,7 @@ class DatabaseHelper:
         if table_name in Valid_Tables:
             return True
         log_error("invalid table Name '" + table_name +
-                   "' valid names are: [" + " ".join(Valid_Tables) + "]")
+                  "' valid names are: [" + " ".join(Valid_Tables) + "]")
         self.__error_code = 4
         return False
 
@@ -135,7 +135,7 @@ class DatabaseHelper:
         for n in content:
             if n not in col_names:
                 log_error("Bad item for insert into " + table_name + " '" + n +
-                           "' valid items are: [" + ",".join(col_names) + "]")
+                          "' valid items are: [" + ",".join(col_names) + "]")
                 return False
         return True
 

@@ -44,13 +44,13 @@ def get_http_response(url: str, user: str = "", password: str = ""):
         h2.endheaders()
         return True, h2
     except TimeoutError as err:
-        logger.log_error("get_http_response", "Error: Request to: " + str(dec.netloc) + " has timed out!!")
+        logger.log_error("get_http_response", "Request to: " + str(dec.netloc) + " has timed out!!")
         return False, None
     except http.client.HTTPException as err:
-        logger.log_error("get_http_response", "Error: Request to: " + str(dec.netloc) + " has http error: " + str(err))
+        logger.log_error("get_http_response", "Request to: " + str(dec.netloc) + " has http error: " + str(err))
         return False, None
     except Exception as err:
-        logger.log_error("get_http_response", "Error: Request to: " + str(dec.netloc) + " has unknown error: " + str(err))
+        logger.log_error("get_http_response", "Request to: " + str(dec.netloc) + " has unknown error: " + str(err))
         return False, None
 
 
@@ -81,15 +81,15 @@ def get_http_page(url: str, user: str = "", password: str = ""):
     res, h2 = get_http_response(url, user, password)
     http_response = h2.getresponse()
     if not res:
-        logger.log_error("getHttpPage", " problem code: ")
         return []
     try:
         http_data = http_response.read().decode("ascii").splitlines()
     except Exception as err:
-        logger.log_error("getHttpPage", " problem during response dedoding: " + str(err))
+        logger.log_error("getHttpPage", " problem during response decoding: " + str(err))
         http_data = []
     if http_response.status != 200:
-        logger.log_error("getHttpPage", "ERROR " + str(http_response.status) + " : " + str(http_response.reason))
+        logger.log_error("getHttpPage", "bad http response: " +
+                         str(http_response.status) + " : " + str(http_response.reason))
     h2.close()
     return http_data
 

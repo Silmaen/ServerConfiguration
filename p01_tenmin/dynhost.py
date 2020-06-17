@@ -68,11 +68,11 @@ def sendtoovh(localip):
     #
     url = "https://" + Dyndnshost + updateprefix + HOST + updatesuffix
     if not ping_host(Dyndnshost):
-        logger.log_error("dynhost", "ERROR: " + Dyndnshost + " is offline")
+        logger.log_error("dynhost", Dyndnshost + " is offline")
         return
     httpdata = get_http_page(url, LOGIN, PASSWORD)
     if len(httpdata) == 0:
-        logger.log_error("dynhost", "ERROR: No results")
+        logger.log_error("dynhost", "No results")
         return
     #
     # badsys must begin the resulting text and hresponse.status is 200
@@ -132,7 +132,7 @@ def main(dry_run: bool = False):
             else:
                 logger.log("dynhost", "No IP changes, no update needed")
         else:
-            logger.log_error("dynhost", "ERROR: unable to retrieve public IP")
+            logger.log_error("dynhost", "unable to retrieve public IP")
             add_mail("DYNHOST\n====")
             add_mail("ERROR while finding public IP")
     else:

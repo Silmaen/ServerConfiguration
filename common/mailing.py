@@ -111,7 +111,7 @@ def sendmail(local_mail_file, local_mailing_list):
     # attempt to restart smtpd:
     if not restart_smtpd():
         # error during restart
-        logger.log_error("mailing", "ERROR: unable to restart smtpd")
+        logger.log_error("mailing", "unable to restart smtpd")
         return False
     # resend message
     ret, lines = system_exec("cat " + local_mail_file + " | sendmail " + local_mailing_list)

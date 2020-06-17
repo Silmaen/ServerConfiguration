@@ -37,7 +37,7 @@ def line_word(string_to_split):
 def get_traffic():
     ret, results = system_exec("netstat -nlib")
     if len(results) < 1:
-        logger.log_error("get_traffic", "ERROR while retrieving traffic")
+        logger.log_error("get_traffic", "retrieving traffic without result")
     res_interface = {}
     for line in results:
         if "<Link>" not in line:

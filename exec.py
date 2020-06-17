@@ -35,7 +35,7 @@ def run_10min(dry_run: bool = False):
     trafic.main(dry_run)
 
 
-def run_hourly(dry_run: bool = False):
+def run_hourly(dry_run: bool = False, from_daily: bool = False):
     """
     hourly procedures
     """
@@ -44,16 +44,17 @@ def run_hourly(dry_run: bool = False):
         logger.log("robot", "Dry run procedure for testing hourly procedures")
     else:
         logger.log("exec", "run hourly procedures")
-    from p02_hour import actualize_ban_list, newsyslog
+    from p02_hour import actualize_ban_list, newsyslog, errorRepport
     actualize_ban_list.main(dry_run)
     newsyslog.main(dry_run)
+    errorRepport.main(dry_run or from_daily)
 
 
 def run_daily(dry_run: bool = False):
     """
     daily procedure
     """
-    run_hourly(dry_run)
+    run_hourly(dry_run, True)
     if dry_run:
         logger.log("robot", "Dry run procedure for testing daily procedures")
     else:
