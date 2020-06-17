@@ -7,7 +7,7 @@ default_lease_location = "/var/db"
 default_lease_file = "dhcpd.leases"
 template_zones_location = "/var/nsd/zones/templates/"
 zones_location = "/var/nsd/zones/"
-lease_list = ["argawaen.net.zone", "192.168.23.reverse.zone"]
+lease_list = ["argawaen.net.zone", "192.168.23.reverse"]
 backup_dir = data_dir
 
 
