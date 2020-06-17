@@ -38,8 +38,12 @@ def log_error(message: str):
     from datetime import datetime
     if not os.path.exists(os.path.dirname(database_error_file)):
         os.makedirs(os.path.dirname(database_error_file))
-    f = open(database_error_file)
+    if not os.path.exists(database_error_file):
+        f = open(database_error_file, "w")
+    else:
+        f = open(database_error_file, "a")
     f.write(str(datetime.now()) + "Db ERROR: " + message)
+    f.close()
 
 
 class DatabaseHelper:
