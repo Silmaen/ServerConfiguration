@@ -20,8 +20,8 @@ else:
     }
 
 Valid_Tables = [
-    "ActiveMachines",    # the currently connected machines that are in the database
-    "ErrorLog",          # list of errors
+    "ActiveMachine",     # the currently connected machines that are in the database
+    "ErrorList",         # list of errors
     "ConnexionArchive",  # archive of connected machine
 ]
 
