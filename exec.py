@@ -74,8 +74,9 @@ def run_weekly(dry_run: bool = False):
         logger.log("robot", "Dry run procedure for testing weekly procedures")
     else:
         logger.log("exec", "run weekly procedures")
-    from p04_week import weekly
+    from p04_week import weekly, auto_renew_ssl
     weekly.main(dry_run)
+    auto_renew_ssl.main(dry_run)
 
 
 # monthly & yearly are specials
