@@ -169,8 +169,7 @@ def get_error_list(start_time: datetime.datetime = datetime.datetime.now(),
     """
     if start_time >= end_time:
         start_time = datetime.datetime.now()
-        start_time = start_time.replace(hour=0, minute=0, second=0)
-        end_time = start_time.replace(day=start_time.day - 1)
+        end_time = start_time - timedelta(days = 1)
     ret, content = db_helper.select("ErrorList", "WHERE `time` BETWEEN '" + str(start_time) + "' AND '" + str(end_time) + "'")
     if not ret:
         return []
