@@ -79,10 +79,10 @@ def get_http_page(url: str, user: str = "", password: str = ""):
     :return: the content of the page
     """
     res, h2 = get_http_response(url, user, password)
-    http_response = h2.getresponse()
     if not res:
         return []
     try:
+        http_response = h2.getresponse()
         http_data = http_response.read().decode("ascii").splitlines()
     except Exception as err:
         logger.log_error("getHttpPage", " problem during response decoding: " + str(err))
