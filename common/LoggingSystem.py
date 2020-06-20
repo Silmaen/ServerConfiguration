@@ -167,10 +167,12 @@ def get_error_list(start_time: datetime.datetime = datetime.datetime.now(),
     :param end_time: higher date
     :return: list of error
     """
-    if start_time >= end_time:
-        start_time = datetime.datetime.now()
-        end_time = start_time - timedelta(days = 1)
-    ret, content = db_helper.select("ErrorList", "WHERE `time` BETWEEN '" + str(start_time) + "' AND '" + str(end_time) + "'")
+    true_end_time = max(start_time, end_time)
+    true_start_time = min(start_time, end_time)
+    if true_end_time - true_start_time < datetime.timedelta(seconds = 1):
+        true_end_time = true_start_time
+        true_start_time = true_end_time - datetime.timedelta(days = 1)
+    ret, content = db_helper.select("ErrorList", "WHERE `time` BETWEEN '" + str(true_start_time) + "' AND '" + str(true_end_time) + "'")
     if not ret:
         return []
     ret = []
