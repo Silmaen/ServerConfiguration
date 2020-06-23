@@ -15,9 +15,11 @@ def run_30sec(dry_run: bool = False):
     """
     if dry_run:
         logger.log("robot", "Dry run procedure for testing 30 seconds procedures")
-    from p00_30seconds import connexion_check, connexion_table
-    connexion_check.main(dry_run)
-    connexion_table.main(dry_run)
+    from p00_30seconds import run
+    e = run(dry_run)
+    for k, v in e.items():
+        if v != "Ok":
+            logger.log_error("robot", k + " -> " + v)
 
 
 def run_10min(dry_run: bool = False):
@@ -28,12 +30,11 @@ def run_10min(dry_run: bool = False):
         logger.log("robot", "Dry run procedure for testing 10 minutes procedures")
     else:
         logger.log("exec", "run 10 minutes procedures")
-    from p01_tenmin import dynhost, lsleases, pflogrotate, trafic
-    dynhost.main(dry_run)
-    lsleases.main(dry_run)
-    pflogrotate.main(dry_run)
-    trafic.main(dry_run)
-
+    from p01_tenmin import run
+    e = run(dry_run)
+    for k, v in e.items():
+        if v != "Ok":
+            logger.log_error("robot", k + " -> " + v)
 
 def run_hourly(dry_run: bool = False, from_daily: bool = False):
     """
@@ -44,10 +45,11 @@ def run_hourly(dry_run: bool = False, from_daily: bool = False):
         logger.log("robot", "Dry run procedure for testing hourly procedures")
     else:
         logger.log("exec", "run hourly procedures")
-    from p02_hour import actualize_ban_list, newsyslog, errorRepport
-    actualize_ban_list.main(dry_run)
-    newsyslog.main(dry_run)
-    errorRepport.main(dry_run or from_daily)
+    from p02_hour import run
+    e = run(dry_run)
+    for k, v in e.items():
+        if v != "Ok":
+            logger.log_error("robot", k + " -> " + v)
 
 
 def run_daily(dry_run: bool = False):
@@ -59,10 +61,11 @@ def run_daily(dry_run: bool = False):
         logger.log("robot", "Dry run procedure for testing daily procedures")
     else:
         logger.log("exec", "run daily procedures")
-    from p03_day import daily, test_newversion, traffic_day
-    daily.main(dry_run)
-    test_newversion.main(dry_run)
-    traffic_day.main(dry_run)
+    from p03_day import run
+    e = run(dry_run)
+    for k, v in e.items():
+        if v != "Ok":
+            logger.log_error("robot", k + " -> " + v)
 
 
 def run_weekly(dry_run: bool = False):
@@ -74,9 +77,11 @@ def run_weekly(dry_run: bool = False):
         logger.log("robot", "Dry run procedure for testing weekly procedures")
     else:
         logger.log("exec", "run weekly procedures")
-    from p04_week import weekly, auto_renew_ssl
-    weekly.main(dry_run)
-    auto_renew_ssl.main(dry_run)
+    from p04_week import run
+    e = run(dry_run)
+    for k, v in e.items():
+        if v != "Ok":
+            logger.log_error("robot", k + " -> " + v)
 
 
 # monthly & yearly are specials
@@ -90,8 +95,11 @@ def run_monthly(last: bool = False, dry_run: bool = False):
         logger.log("robot", "Dry run procedure for testing monthly procedures")
     else:
         logger.log("exec", "run monthly procedures")
-    from p05_month import newsyslog_force
-    newsyslog_force.main(dry_run)
+    from p05_month import run
+    e = run(dry_run)
+    for k, v in e.items():
+        if v != "Ok":
+            logger.log_error("robot", k + " -> " + v)
     #
     # pack monthly
     #
@@ -123,7 +131,11 @@ def run_yearly(dry_run: bool = False):
         logger.log("robot", "Dry run procedure for testing yearly procedures")
     else:
         logger.log("exec", "run yearly procedures")
-    # from p06_year import *
+    from p06_year import run
+    e = run(dry_run)
+    for k, v in e.items():
+        if v != "Ok":
+            logger.log_error("robot", k + " -> " + v)
     #
     # pack yearly
     #
@@ -153,6 +165,11 @@ def run_special(dry_run: bool = False):
         logger.log("robot", "Dry run procedure for testing special procedures")
     else:
         logger.log("exec", "run special procedures")
+    from p07_special import run
+    e = run(dry_run)
+    for k, v in e.items():
+        if v != "Ok":
+            logger.log_error("robot", k + " -> " + v)
 
 
 def run_unit_tests():
@@ -163,8 +180,9 @@ def run_unit_tests():
     logger.log("TestingSystem", "*-------------------------*")
     logger.log("TestingSystem", "|    testing procedure    |")
     logger.log("TestingSystem", "*-------------------------*")
-    test_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tests", "testingmain.py")
-    cmd = ["python3 ", "python "][sys.platform in ["Windows", "win32"]] + " -m unittest " + os.path.join(test_dir)
+    test_exec = os.path.join(os.path.dirname(os.path.abspath(__file__)), "test.py")
+    cmd = ["python3", "python"][sys.platform in ["Windows", "win32"]] + " " + os.path.join(test_exec)
+    logger.log("TestingSystem", cmd)
     ret, lines = system_exec(cmd)
     for line in lines:
         logger.log("TestingSystem", line)
