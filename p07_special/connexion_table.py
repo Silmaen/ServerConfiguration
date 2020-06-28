@@ -49,6 +49,7 @@ def main(dry_run: bool = False):
     :param dry_run: if the script should be run without system modification
     :return:
     """
+    return
     machine_list_db = get_active_machine_db()
     machine_list_con = get_connected_machines()
     machines = []

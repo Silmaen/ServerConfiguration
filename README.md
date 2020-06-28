@@ -11,6 +11,7 @@ These maintenances script are designed for OpenBSD 6.7, they came in replacement
 These scripts require 
  * Python 3.7 (with the default command line '/usr/local/bin/python')
  * 'mysqlclient' python module (`>python3 -m pip install mysqlclient`)
+ * 'markdown' python module (`>python3 -m pip install markdown`)
  * a working command `sendmail`
  * a working MySQL server
 

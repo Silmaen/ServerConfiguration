@@ -2,7 +2,8 @@
 """
 weekly procedures (based on OpenBSD ones)
 """
-from common.maintenance import *
+from common.maintenance import logger, system_exec
+from common.MailingSystem import add_paragraph_with_lines, add_mail_line
 
 
 def locate_database():
@@ -15,13 +16,9 @@ def locate_database():
     ret, lines = system_exec("/usr/libexec/locate.updatedb")
     if len(lines) != 0:
         # houston, we got a problem
-        logger.log("weekly", "problem in locate database update")
-        add_mail("Problems in locate database reconstruction\n====")
-        add_mail("[VERBATIM]")
-        for line in lines:
-            logger.log("weekly", line)
-            add_mail(line)
-        add_mail("[/VERBATIM]")
+        logger.log_error("weekly", "problem in locate database update\n" + "\n".join(lines))
+        add_paragraph_with_lines("locate_database", 3, pre_message=["Problems in locate database reconstruction"],
+                                 lines=lines)
 
 
 def check_packages():
@@ -38,13 +35,9 @@ def check_packages():
             break
     if not ok:
         # houston, we got a problem
-        logger.log("weekly", "problem in packages")
-        add_mail("Problems in packages\n====")
-        add_mail("[VERBATIM]")
-        for line in lines:
-            logger.log("weekly", line)
-            add_mail(line)
-        add_mail("[/VERBATIM]")
+        logger.log_error("weekly", "problem in packages\n" + "\n".join(lines))
+        add_paragraph_with_lines("check_packages", 3, pre_message=["problem in packages"],
+                                 lines=lines)
 
 
 def whatis_database():
@@ -57,13 +50,9 @@ def whatis_database():
     ret, lines = system_exec("/usr/sbin/makewhatis")
     if len(lines) != 0:
         # il y a un probleme
-        logger.log_error("weekly", "problem in whatis database update")
-        add_mail("Problems in whatis database reconstruction\n====")
-        add_mail("[VERBATIM]")
-        for line in lines:
-            logger.log("weekly", line)
-            add_mail(line)
-        add_mail("[/VERBATIM]")
+        logger.log_error("weekly", "problem in whatis database update\n" + "\n".join(lines))
+        add_paragraph_with_lines("whatis_database", 3, pre_message=["problem in whatis database update"],
+                                 lines=lines)
 
 
 def login_account():
@@ -72,14 +61,9 @@ def login_account():
     :return:
     """
     # ac -p | sort -nr -k 2
-    logger.log("weekly", "login time statistics")
     ret, lines = system_exec("ac -p | sort -nr -k 2")
-    add_mail("Login statistics\n====")
-    add_mail("[VERBATIM]")
-    for line in lines:
-        logger.log("weekly", line)
-        add_mail(line)
-    add_mail("[/VERBATIM]")
+    logger.log("weekly", "login time statistics\n" + "\n".join(lines))
+    add_paragraph_with_lines("Login statistic", 3, lines=lines)
 
 
 def main(dry_run: bool = False):
@@ -88,9 +72,9 @@ def main(dry_run: bool = False):
     :param dry_run: if the script should be run without system modification
     :return:
     """
-    logger.log("weekly", "runing weekly procedure")
+    logger.log("weekly", "running weekly procedure")
     #
-    add_mail("WEEKLY procedure\n=====")
+    add_mail_line("##WEEKLY procedure##")
     #
     if not dry_run:
         locate_database()

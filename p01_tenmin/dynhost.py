@@ -133,8 +133,6 @@ def main(dry_run: bool = False):
                 logger.log("dynhost", "No IP changes, no update needed")
         else:
             logger.log_error("dynhost", "unable to retrieve public IP")
-            add_mail("DYNHOST\n====")
-            add_mail("ERROR while finding public IP")
     else:
         logger.log("dynhost", "Internet connexion is DOWN")
         if not dry_run:

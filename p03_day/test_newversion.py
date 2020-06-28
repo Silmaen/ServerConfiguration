@@ -4,7 +4,8 @@
 scrit for testing the possibility to upgrade the system
 """
 from common.httputils import exist_http_page
-from common.maintenance import system_exec, logger, add_mail
+from common.maintenance import system_exec, logger
+from common.MailingSystem import add_paragraph
 
 base_repository = "https://ftp.openbsd.org/pub/OpenBSD/"
 
@@ -48,14 +49,16 @@ def main(dry_run: bool = False):
     url_new = base_repository + new_version + "/"
     if exist_http_page(url_new):
         logger.log("newversion_check", "WARNING: new OpenBSD version available!", 1)
-        add_mail("WARNING: new OpenBSD version available at: " + url_new)
+        add_paragraph("OpenBSD Version Check",
+                      message="**WARNING**: new OpenBSD version available [here](" + url_new + ")")
     else:
         logger.log("newversion_check", "no new OpenBSD version available!")
         # logger.log("newversion_check"," check at: '"+urlnew+"'")
     url_new = base_repository + old_version + "/"
     if not exist_http_page(url_new):
         logger.log_error("newversion_check", "Actual OpenBSD version no more supported")
-        add_mail("WARNING: actual OpenBSD version no more supported ")
+        add_paragraph("OpenBSD Version Check",
+                      message="**WARNING**: actual OpenBSD version no more supported")
     else:
         logger.log("newversion_check", "Actual OpenBSD version still available!")
 

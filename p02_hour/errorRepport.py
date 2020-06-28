@@ -2,9 +2,9 @@
 """
 script to generate a mail error report if too many errors occurs
 """
-from common.maintenance import add_mail
 from common.LoggingSystem import get_error_list
 from datetime import datetime, timedelta
+from common.MailingSystem import new_mail, add_paragraph_with_array
 
 
 def main(dry_run: bool = False):
@@ -16,12 +16,13 @@ def main(dry_run: bool = False):
     if dry_run:
         return
     now = datetime.now()
-    past = now - timedelta(hours = 1)
+    past = now - timedelta(hours=1)
     errors = get_error_list(past, now)
     if len(errors) > 10:
-        add_mail("Too Many Errors in one Hour:\n")
+        errors_md = []
         for err in errors:
-            add_mail(str(err))
+            errors_md.append(err.to_md_array())
+        add_paragraph_with_array("Too Many Errors in one Hour", col_titles=["time", "who", "message"], rows=errors_md)
 
 
 if __name__ == "__main__":
