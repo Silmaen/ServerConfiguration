@@ -41,7 +41,7 @@ def main(dry_run: bool = False):
         add_paragraph("SSL renewal", message="SSL certificates are still valid")
     else:
         logger.log("autoSSLRenew", "Certificates due to renewal")
-        ret, lines = system_exec("certbot renew" + ["", " --dry-run"][dry_run])
+        ret, lines = system_exec("/usr/local/bin/certbot renew" + ["", " --dry-run"][dry_run])
         if ret != 0:
             logger.log_error("autoSSLRenew", "certbot return code (" + str(ret) + ")")
             for line in lines:
