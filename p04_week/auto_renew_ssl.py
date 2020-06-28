@@ -5,8 +5,13 @@ procedures to renew SSL certificates
 from common.maintenance import logger, system_exec
 from common.MailingSystem import add_paragraph, add_paragraph_with_lines
 
+
 def check_certificates():
-    ret, lines = system_exec("certbot certificates")
+    """
+    check the actual certificates to see if a renewal has to be done
+    :return: True if the certificates are still valid
+    """
+    ret, lines = system_exec("/usr/local/bin/certbot certificates")
     if ret != 0:
         logger.log_error("autoSSLRenew", "getting certificates (" + str(ret) + ")")
         for line in lines:
