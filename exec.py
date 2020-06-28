@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 
-from common.maintenance import *
+from common.AllDefaultParameters import *
+from common.LoggingSystem import Logger
+from common.maintenance import logger, system_exec
 import argparse
-import common.mailing as mailing
+#import common.mailing as mailing
 import datetime
+import os
+from common.MailingSystem import end_mail_procedure
 
 the_date = datetime.datetime.now()
 tomorrow_date = the_date + datetime.timedelta(days=1)
@@ -35,6 +39,7 @@ def run_10min(dry_run: bool = False):
     for k, v in e.items():
         if v != "Ok":
             logger.log_error("robot", k + " -> " + v)
+
 
 def run_hourly(dry_run: bool = False, from_daily: bool = False):
     """
@@ -220,7 +225,8 @@ def main():
         run_30sec()
         return
     if args.mailing:
-        mailing.main(False, True)
+        ## mailing.main(False, True)
+        end_mail_procedure(False)
         return
     if args.dry_run:
         logger = Logger(os.path.join(log_dir, "maintenance_dry_run.log"), args.verbose)
@@ -228,7 +234,8 @@ def main():
         run_30sec(True)
         run_weekly(True)
         run_yearly(True)
-        mailing.main()
+        ## mailing.main()
+        end_mail_procedure()
         logger.log("robot", "\n\n --- Done Dry run procedure for testing --- \n")
         return
     #
@@ -260,7 +267,8 @@ def main():
     #
     # mailing procedure
     #
-    mailing.main()
+    ## mailing.main()
+    end_mail_procedure()
     logger.log("exec", "--- DONE ---")
 
 

@@ -2,11 +2,13 @@
 """
 the daily procedure (coming from OpenBSD)
 """
-from common.Connexion_DB import *
-from common.LoggingSystem import get_error_list
-import time
 import datetime
 import shutil
+import time
+
+from common.Connexion_DB import *
+from common.LoggingSystem import get_error_list
+from common.MailingSystem import add_paragraph_with_items, add_paragraph, add_paragraph_with_array, add_mail_line, add_paragraph_with_lines
 
 
 def setheaderlines():
@@ -79,13 +81,8 @@ def services():
     if len(lines) == 0:
         # everything is OK!
         return
-    logger.log("daily", "Services that should be running but aren't")
-    add_mail("Services that should be running but aren't\n====")
-    add_mail("[VERBATIM]")
-    for line in lines:
-        logger.log("daily", line)
-        add_mail(line)
-    add_mail("[/VERBATIM]")
+    logger.log("daily", "Services that should be running but aren't\n" + "\n".join(lines))
+    add_paragraph_with_items("Services that should be running but aren't", lines=lines)
 
 
 def disk():
@@ -96,13 +93,8 @@ def disk():
     ret, lines = system_exec("df -hl")
     if len(lines) == 0:
         return
-    logger.log("daily", "Disks:")
-    add_mail("Disks\n====")
-    add_mail("[VERBATIM]")
-    for line in lines:
-        logger.log("daily", line)
-        add_mail(line)
-    add_mail("[/VERBATIM]")
+    logger.log("daily", "Disks:\n" + "\n".join(lines))
+    add_paragraph_with_items("Disks", lines=lines)
 
 
 MySQLParams = {
@@ -122,13 +114,9 @@ def network():
     if len(lines) == 0:
         return
     logger.log("daily", "Network:")
-    add_mail("Network\n====")
-    add_mail("Statistics\n===")
-    add_mail("[VERBATIM]")
-    for line in lines:
-        logger.log("daily", line)
-        add_mail(line)
-    add_mail("[/VERBATIM]")
+    logger.log("daily", "\n".join(lines))
+    add_mail_line("##Network##")
+    add_paragraph_with_lines("Statistics", 3, lines=lines)
     ending = datetime.datetime.now()
     starting = ending - datetime.timedelta(days=1)
     DB = MyDataBase(MySQLParams, "ClientStatistic")
@@ -138,12 +126,8 @@ def network():
     machine_list = DB.get_connexions_between(starting, ending)
     lines = print_machine_list_duration(machine_list)
     logger.log("daily", "Connected machines:")
-    add_mail("Connected machines\n===")
-    add_mail("[VERBATIM]")
-    for line in lines:
-        logger.log("daily", line)
-        add_mail(line)
-    add_mail("[/VERBATIM]")
+    logger.log("daily", "\n".join(lines))
+    add_paragraph_with_lines("Connected machines", 3, lines=lines)
 
 
 def check_daily_errors():
@@ -151,12 +135,13 @@ def check_daily_errors():
     check for error in database
     """
     err_list = get_error_list()
-    add_mail("Error Status\n===")
     if len(err_list) == 0:
-        add_mail("Everything is good!")
+        add_paragraph("Error Status", message="Everything is good!")
     else:
+        errors_md = []
         for err in err_list:
-            add_mail(str(err))
+            errors_md.append(err.to_md_array())
+        add_paragraph_with_array("Too Many Errors in one Hour", col_titles=["time", "who", "message"], rows=errors_md)
 
 
 def main(dry_run: bool = False):
@@ -168,9 +153,7 @@ def main(dry_run: bool = False):
     logger.log("daily", "runing daily procedure")
     #
     hlines = setheaderlines()
-    add_mail("DAILY procedure\n=====")
-    for hline in hlines:
-        add_mail(hline)
+    add_paragraph_with_lines("DAILY procedure", 3, lines=hlines)
     #
     if not dry_run:
         remove_tmp()

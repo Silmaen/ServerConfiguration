@@ -40,6 +40,13 @@ class ErrorData:
         else:
             return {"who": self.who, "message": self.message, "time": self.time}
 
+    def to_md_array(self):
+        """
+        return an array item with md format
+        :return:
+        """
+        return [self.time.strftime("*%Y-%h-%d %H:%M:%S*"), "**" + self.who + "**", self.message]
+
     def from_dict(self, content: dict):
         """
         update informations based of the content of the dict

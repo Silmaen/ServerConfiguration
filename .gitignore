@@ -12,3 +12,4 @@ data/*.html
 *.out
 *.old
 /data/*.dat
+/data/mail.md

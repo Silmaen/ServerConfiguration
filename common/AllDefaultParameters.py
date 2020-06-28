@@ -9,6 +9,8 @@ local_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 log_dir = os.path.join(local_path, "log")
 # folder for disk data
 data_dir = os.path.join(local_path, "data")
+# folder for configuration files
+config_dir = os.path.join(local_path, "config")
 
 # constant for the logging system
 default_logfile = "maintenance"

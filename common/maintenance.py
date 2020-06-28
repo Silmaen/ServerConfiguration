@@ -95,19 +95,3 @@ def get_host_ip(host):
         return "0.0.0.0"
     return lines[0].split("(", 1)[-1].split(")", 1)[0]
 
-
-def add_mail(message):
-    if not os.path.exists(mail_file_txt):
-        ffi = open(mail_file_txt, "w")
-        ffi.write("Activity report from argawaen.net server\n")
-        ffi.write("======\n\n")
-        ffi.write(time.strftime("%Y %h %d %H:%M:%S") + "\n")
-    else:
-        ffi = open(mail_file_txt, "a")
-    ffi.write(message + "\n")
-    ffi.close()
-
-
-def flush_mail():
-    if os.path.exists(mail_file_txt):
-        os.remove(mail_file_txt)
