@@ -35,7 +35,7 @@ def new_mail():
     clean_mail()
     fd = open(md_mail_file, "w")
     fd.write("# Activity Report #\n")
-    fd.write("> ## generalities ##\n")
+    fd.write("> ## General ##\n")
     fd.write("> " + datetime.now().strftime("%Y %m %d %H:%M:%S") + "\n")
     fd.write("\n")
     fd.close()
@@ -96,8 +96,20 @@ def add_paragraph_with_lines(title: str, level: int = 2, pre_message=None, lines
         pre_message = []
     if lines is None:
         lines = []
-    add_paragraph(title, level, "\n".join(pre_message) + "\n\n    " +
-                  "\n    ".join(lines) + "\n\n" + "\n".join(post_message))
+    message = []
+    for it in pre_message:
+        message.append(it)
+    if len(pre_message) > 0:
+        message.append("")
+    for line in lines:
+        message.append("    " + line)
+    if len(lines) > 0:
+        message.append("")
+    for it in post_message:
+        message.append(it)
+    if len(post_message) > 0:
+        message.append("")
+    add_paragraph(title, level, message)
 
 
 def add_paragraph_with_items(title: str, level: int = 2, pre_message=None, lines=None, post_message=None):
@@ -116,8 +128,20 @@ def add_paragraph_with_items(title: str, level: int = 2, pre_message=None, lines
         pre_message = []
     if lines is None:
         lines = []
-    add_paragraph(title, level, "\n".join(pre_message) + "\n\n* " +
-                  "\n* ".join(lines) + "\n\n" + "\n".join(post_message))
+    message = []
+    for it in pre_message:
+        message.append(it)
+    if len(pre_message) > 0:
+        message.append("")
+    for line in lines:
+        message.append("* " + line)
+    if len(lines) > 0:
+        message.append("")
+    for it in post_message:
+        message.append(it)
+    if len(post_message) > 0:
+        message.append("")
+    add_paragraph(title, level, message)
 
 
 def add_paragraph_with_array(title: str, level: int = 2, col_titles=None, rows=None, pre_message=None,
@@ -146,7 +170,7 @@ def add_paragraph_with_array(title: str, level: int = 2, col_titles=None, rows=N
     # pre message
     for line in pre_message:
         fd.write("> " + line + "\n")
-    fd.write("\n")
+    fd.write(">\n")
     # array
     fd.write("> |")
     for col_title in col_titles:
@@ -164,7 +188,7 @@ def add_paragraph_with_array(title: str, level: int = 2, col_titles=None, rows=N
         for a in r:
             fd.write(" " + a + " |")
         fd.write("\n")
-    fd.write("\n")
+    fd.write(">\n")
     # post message
     for line in post_message:
         fd.write("> " + line + "\n")
