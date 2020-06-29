@@ -220,8 +220,8 @@ def generate_htmlfile():
     text = fp.readlines()
     fp.close()
     ret_lines = []
-    md_lines = markdown("".join(text), extensions=['tables']).splitlines()
-    for line in lines:
+    md_lines = markdown("".join(lines), extensions=['tables']).splitlines()
+    for line in text:
         if "{% content %}" in line:
             indent = line.split("{% content %}")[0]
             for li in md_lines:
