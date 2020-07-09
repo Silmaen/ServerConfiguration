@@ -11,6 +11,10 @@ log_dir = os.path.join(local_path, "log")
 data_dir = os.path.join(local_path, "data")
 # folder for configuration files
 config_dir = os.path.join(local_path, "config")
+# folder for configuration files
+resource_dir = os.path.join(config_dir, "resources")
+# folder for configuration files
+template_dir = os.path.join(config_dir, "templates")
 
 # constant for the logging system
 default_logfile = "maintenance"

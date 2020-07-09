@@ -17,7 +17,7 @@ def read_leases(filename=""):
     if not os.path.exists(filename):
         logger.log_error("lslease", "no lease files found at '" + filename + "'")
         return {}
-    ff = open(filename, "r")
+    ff = open(filename)
     lines = ff.readlines()
     ff.close()
     raw_lease = ""
@@ -41,7 +41,7 @@ def read_leases(filename=""):
                 items["hardware ethernet"] = item.rsplit(' ', 1)[-1]
             if "client-hostname" in item:
                 items["client-hostname"] = item.rsplit(' ', 1)[-1].replace('"', '')
-        result[address] = items;
+        result[address] = items
     return result
 
 
@@ -61,7 +61,7 @@ def generate_zones(leases):
         for lease in lease_list:
             shutil.copy(os.path.join(template_zones_location, lease + ".template"), os.path.join(zones_location, lease))
         return
-    f = open(os.path.join(template_zones_location, "argawaen.net.zone.template"), "r")
+    f = open(os.path.join(template_zones_location, "argawaen.net.zone.template"))
     dlines = f.readlines()
     f.close()
     f = open(os.path.join(zones_location, "argawaen.net.zone"), "w")
@@ -73,7 +73,7 @@ def generate_zones(leases):
                 mline = name + "      IN A            " + lease_adr + "\n"
                 f.write(mline)
     f.close()
-    f = open(os.path.join(template_zones_location, "192.168.23.reverse.template"), "r")
+    f = open(os.path.join(template_zones_location, "192.168.23.reverse.template"))
     rlines = f.readlines()
     f.close()
     f = open(os.path.join(zones_location, "192.168.23.reverse"), "w")
@@ -100,7 +100,7 @@ def backup_hosts(leases):
         new_hosts[name] = lease_adr
     back_hosts = os.path.join(backup_dir, "backhosts")
     if os.path.exists(back_hosts):
-        f = open(back_hosts, "r")
+        f = open(back_hosts)
         lines = f.readlines()
         f.close()
         for line in lines:

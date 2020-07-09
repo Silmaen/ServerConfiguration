@@ -3,14 +3,14 @@ Global mailing system
 """
 import os
 import shutil
-from common.AllDefaultParameters import data_dir, config_dir
+from common.AllDefaultParameters import data_dir, config_dir, resource_dir, template_dir
 from common.maintenance import logger, system_exec
 
 
 md_mail_file = os.path.join(data_dir, "mail.md")
 html_mail_file = os.path.join(data_dir, "mail.html")
-template_mail_file = os.path.join(data_dir, "mailtemplate.html")
-css_mail_file = os.path.join(data_dir, "mail.css")
+template_mail_file = os.path.join(template_dir, "mailtemplate.html")
+css_mail_file = os.path.join(resource_dir, "mail.css")
 mailing_list_file = os.path.join(config_dir, "MailingList")
 mail_to_send = os.path.join(data_dir, "mail_to_send")
 
@@ -34,8 +34,8 @@ def new_mail():
     from datetime import datetime
     clean_mail()
     fd = open(md_mail_file, "w")
-    fd.write("# Activity Report #\n")
-    fd.write("> ## General ##\n")
+    fd.write("# Activity Report from argawaen.net server #\n")
+    fd.write("## General ##\n")
     fd.write("> " + datetime.now().strftime("%Y %m %d %H:%M:%S") + "\n")
     fd.write("\n")
     fd.close()
@@ -73,9 +73,11 @@ def add_paragraph(title: str, level: int = 2, message=None):
         message = []
     test_mail()
     fd = open(md_mail_file, "a")
-    fd.write("> " + "#"*level + " " + title + " " + "#"*level + "\n")
+    quote = ["", ">"*(level-2)][level>2]
+    fd.write(quote + " " + "#"*level + " " + title + " " + "#"*level + "\n")
+    quote += ">"
     for line in message:
-        fd.write("> " + line + "\n")
+        fd.write(quote + " " + line + "\n")
     fd.write("\n")
     fd.close()
 
@@ -225,15 +227,16 @@ def generate_htmlfile():
         if "{% content %}" in line:
             indent = line.split("{% content %}")[0]
             for li in md_lines:
-                ret_lines.append(indent + li + "\n")
+                ret_lines.append(indent + li.rstrip() + "\n")
             continue
         if "{% date %}" in line:
             line = line.replace("{% date %}", datetime.now().strftime("%Y %m %d"))
         if "{% style %}" in line:
             line = line.replace("{% style %}", get_style())
-        ret_lines.append(line)
+        ret_lines.append(line.rstrip() + "\n")
     fo = open(html_mail_file, "w")
-    fo.writelines(ret_lines)
+    for line in ret_lines:
+        fo.write(line)
     fo.close()
 
 
