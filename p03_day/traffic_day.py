@@ -21,7 +21,7 @@ def main(dry_run: bool = False):
         logger.log("trafic", Interface[key] + " out:" + byte_human(oldinterf[key]["out"]) + " in:" + byte_human(
             oldinterf[key]["in"]))
         interf.append([Interface[key], byte_human(oldinterf[key]["out"]), byte_human(oldinterf[key]["in"])])
-    add_paragraph_with_array("Daily Trafic Statistics", col_titles=["interface", "in", "ont"], rows=interf)
+    add_paragraph_with_array("Daily Trafic Statistics", col_titles=["interface", "out", "in"], rows=interf)
     if not dry_run:
         os.remove(traffic_file_day)
 

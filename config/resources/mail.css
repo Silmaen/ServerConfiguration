@@ -1,0 +1,33 @@
+body{
+  color: #AAAAAA;
+  background-color: #444444;
+  font-family:Arial,Helvetica,sans-serif;
+}
+h1,h2{
+  color: #DEDEDE;
+  border-bottom: 1px #222222 solid;
+  padding-bottom: 15px ;
+}
+blockquote{
+  border-left: 4px #999999 solid;
+  padding-left: 15px;
+  margin-left: 0;
+}
+pre{
+  background-color: #333333;
+  font-family:monospace;
+  padding: 15px;
+  color: #DDDDDD;
+  overflow-x:auto;
+}
+table{
+  background-color: #333333;
+  padding-top: 5px;
+  padding-left: 5px;
+}
+thead {
+  padding-bottom: 10px;
+}
+td {
+  padding: 5px;
+}
