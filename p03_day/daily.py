@@ -115,7 +115,7 @@ def network():
         return
     logger.log("daily", "Network:")
     logger.log("daily", "\n".join(lines))
-    add_mail_line("##Network##")
+    add_mail_line("## Network ##")
     add_paragraph_with_lines("Statistics", 3, lines=lines)
     ending = datetime.datetime.now()
     starting = ending - datetime.timedelta(days=1)
