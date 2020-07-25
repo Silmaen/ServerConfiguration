@@ -71,10 +71,14 @@ def add_paragraph(title: str, level: int = 2, message=None):
     """
     if message is None:
         message = []
+    if type(message) == str:
+        message = [message]
+    if type(message) != list:
+        return
     test_mail()
     fd = open(md_mail_file, "a")
-    quote = ["", ">"*(level-2)][level>2]
-    fd.write(quote + " " + "#"*level + " " + title + " " + "#"*level + "\n")
+    quote = ["", ">"*(level-2) + " "][level > 2]
+    fd.write(quote + "#"*level + " " + title + " " + "#"*level + "\n")
     quote += ">"
     for line in message:
         fd.write(quote + " " + line + "\n")
