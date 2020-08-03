@@ -4,7 +4,9 @@ all logging functions here
 from common.AllDefaultParameters import *
 from common.databasehelper import DatabaseHelper
 import datetime
+import os
 
+log_data = os.path.join(data_dir, "log_info.dat")
 db_helper = DatabaseHelper()
 message_level_decorator = ["ERROR ", "WARNING ", "MESSAGE ", "DEBUG "]
 
@@ -81,19 +83,21 @@ class Logger:
     class used to log messages (singleton design pattern)
     """
     def __init__(self, destination=None, level: int = -1):
-        import os
-        log_data = os.path.join(data_dir, "log_info.dat")
         self.destination = None
         self.level = -1
         self.isfile = False
         if not destination and level < 0:
             if not os.path.exists(log_data):
                 print("No default value for logging")
+                self.__set_parameter()
                 return
             else:
                 fd = open(log_data)
                 lines = fd.readlines()
                 fd.close()
+                if len(lines) == 0:
+                    print("Empty datafile for logging")
+                    self.__set_parameter()
                 for line in lines:
                     if len(line.strip()) == 0 or line.strip().startswith("#"):
                         continue
@@ -102,20 +106,26 @@ class Logger:
                         continue
                     try:
                         self.level = int(line)
-                    except:
+                    except Exception as err:
                         self.level = -1
+                        print("Exception in decoding log level: " + str(err.with_traceback()))
                     break
                 if self.level < 0:
                     print("Badly-formed datafile for logging")
+                    print(lines)
+                    self.__set_parameter()
                     return
         else:
-            self.destination = destination
-            self.level = min(max(0, level), len(message_level_decorator))
-            fd = open(log_data, "w")
-            fd.write(self.destination + "\n")
-            fd.write(str(self.level) + "\n")
-            fd.close()
+            self.__set_parameter(destination, level)
         self.isfile = self.destination.lower() != "console"
+
+    def __set_parameter(self, dest: str = "/var/maintenance/log/maintenance.log", lvl: int = 1):
+        self.destination = dest
+        self.level = min(max(0, lvl), len(message_level_decorator))
+        fd = open(log_data, "w")
+        fd.write(self.destination + "\n")
+        fd.write(str(self.level) + "\n")
+        fd.close()
 
     def __str__(self):
         return repr(self) + str(self.level) + " " + str(self.destination)
