@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 
 from common.AllDefaultParameters import *
-from common.LoggingSystem import Logger
-from common.maintenance import logger, system_exec
+from common.maintenance import logger, initloger, system_exec
 import argparse
-#import common.mailing as mailing
 import datetime
 import os
 from common.MailingSystem import end_mail_procedure
@@ -196,7 +194,6 @@ def run_unit_tests():
 
 
 def main():
-    global logger
     parser = argparse.ArgumentParser()
     parser.add_argument("-f", "--fast", action="store_true",
                         help="Run the script in FAST mode: only 30sec actions no mail")
@@ -210,18 +207,17 @@ def main():
     args = parser.parse_args()
 
     # initialise the default logging system
-    logger = Logger(full_logfile, args.verbose)
-    
+    initloger(full_logfile, args.verbose)
     if args.test_mode:
-        logger = Logger("console", 5)
+        initloger("console", 5)
         run_unit_tests()
         return
     if args.special:
-        logger = Logger("console", args.verbose)
+        initloger("console", args.verbose)
         run_special(args.dry_run)
         return
     if args.fast:
-        logger = Logger(full_logfile, args.verbose)
+        initloger(full_logfile, args.verbose)
         run_30sec()
         return
     if args.mailing:
@@ -229,7 +225,7 @@ def main():
         end_mail_procedure(False)
         return
     if args.dry_run:
-        logger = Logger(os.path.join(log_dir, "maintenance_dry_run.log"), args.verbose)
+        initloger(os.path.join(log_dir, "maintenance_dry_run.log"), args.verbose)
         logger.log("robot", "\n\n --- Dry run procedure for testing --- \n")
         run_30sec(True)
         run_weekly(True)

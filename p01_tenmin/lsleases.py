@@ -65,9 +65,11 @@ def generate_zones(leases):
         f.write(line)
         if line.startswith(";;;%%%DYN ADDRESS%%%"):
             for lease_adr in leases.keys():
-                name = leases[lease_adr]['client-hostname']
-                mline = name + "      IN A            " + lease_adr + "\n"
-                f.write(mline)
+                if 'client-hostname' in leases[lease_adr].keys():
+                    name = leases[lease_adr]['client-hostname']
+                    mline = name + "      IN A            " + lease_adr + "\n"
+                    f.write(mline)
+
     f.close()
     f = open(os.path.join(template_zones_location, "192.168.23.reverse.template"))
     rlines = f.readlines()
@@ -77,11 +79,12 @@ def generate_zones(leases):
         f.write(line)
         if line.startswith(";;;%%%DYN ADDRESS%%%"):
             for lease_adr in leases.keys():
-                name = leases[lease_adr]['client-hostname']
-                adrit = lease_adr.split(".")
-                revadr = adrit[3] + "." + adrit[2] + "." + adrit[1] + "." + adrit[0]
-                mline = revadr + ".in-addr.arpa.    IN      PTR     " + name + ".argawaen.net.\n"
-                f.write(mline)
+                if 'client-hostname' in leases[lease_adr].keys():
+                    name = leases[lease_adr]['client-hostname']
+                    adrit = lease_adr.split(".")
+                    revadr = adrit[3] + "." + adrit[2] + "." + adrit[1] + "." + adrit[0]
+                    mline = revadr + ".in-addr.arpa.    IN      PTR     " + name + ".argawaen.net.\n"
+                    f.write(mline)
     f.close()
 
 
@@ -92,8 +95,9 @@ def backup_hosts(leases):
         return False
     res = False
     for lease_adr in leases.keys():
-        name = leases[lease_adr]['client-hostname']
-        new_hosts[name] = lease_adr
+        if 'client-hostname' in leases[lease_adr].keys():
+            name = leases[lease_adr]['client-hostname']
+            new_hosts[name] = lease_adr
     back_hosts = os.path.join(backup_dir, "backhosts")
     if os.path.exists(back_hosts):
         f = open(back_hosts)
