@@ -12,6 +12,11 @@ logger = Logger()
 ip_file = data_dir + "/old.ip"
 
 
+def initloger(lg_file, verbose):
+    global logger
+    logger = Logger(lg_file, verbose)
+
+
 def system_exec(cmd: str, who: str = "", what: str = ""):
     """
     execute a system command
