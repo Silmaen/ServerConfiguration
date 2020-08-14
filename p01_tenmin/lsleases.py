@@ -45,10 +45,6 @@ def read_leases(filename=""):
     return result
 
 
-def print_leases(leases):
-    print(str(leases))
-
-
 def generate_zones(leases):
     has_all_template = True
     for lease in lease_list:

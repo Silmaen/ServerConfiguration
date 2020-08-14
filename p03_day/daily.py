@@ -2,19 +2,19 @@
 """
 the daily procedure (coming from OpenBSD)
 """
-import datetime
 import shutil
-import time
+
 
 from common.Connexion_DB import *
 from common.LoggingSystem import get_error_list
-from common.MailingSystem import add_paragraph_with_items, add_paragraph, add_paragraph_with_array, add_mail_line, add_paragraph_with_lines
+from common.MailingSystem import add_paragraph_with_items, add_paragraph, add_paragraph_with_array, add_mail_line, \
+    add_paragraph_with_lines
 
 
 def setheaderlines():
     """
     get information about kernel version and uptime
-    :return: lines to be printed in mail
+    :return: lines to be displayed in mail
     """
     res = []
     cmd = "sysctl -n kern.version"
@@ -124,7 +124,7 @@ def network():
         logger.log("ClientStatistics", "Unable to get the database")
         return
     machine_list = DB.get_connexions_between(starting, ending)
-    lines = print_machine_list_duration(machine_list)
+    lines = get_machine_list_duration(machine_list)
     logger.log("daily", "Connected machines:")
     logger.log("daily", "\n".join(lines))
     add_paragraph_with_lines("Connected machines", 3, lines=lines)
