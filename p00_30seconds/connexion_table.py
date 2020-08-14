@@ -25,26 +25,26 @@ def main(dry_run: bool = False):
     if not db.db_connexion():
         logger.log_error("connexion_table", "No connexion to MySQL database!")
         return
-    logger.log("connexion_table", ct.format_current("db connexion"))
+    logger.log("connexion_table", ct.format_current("db connexion"), 1)
     # read database
     if not db.get_active_machine_list():
         logger.log_error("connexion_table", "MySQL database has no Active machine list")
         return
-    logger.log("connexion_table", ct.format_current("get active machine"))
+    logger.log("connexion_table", ct.format_current("get active machine"), 1)
     # look for true connected machines
     db.get_connected_machines()
-    logger.log("connexion_table", ct.format_current("get connected machine"))
+    logger.log("connexion_table", ct.format_current("get connected machine"), 1)
     # do the comparison between DataBase and measures
     db.compare_machine_list()
-    logger.log("connexion_table", ct.format_current("compare machine list"))
+    logger.log("connexion_table", ct.format_current("compare machine list"), 1)
     # actualize the server DataBase
     if not dry_run:
         db.bd_actualize()
-        logger.log("connexion_table", ct.format_current("actualize db"))
+        logger.log("connexion_table", ct.format_current("actualize db"), 1)
     # close connexion to the server
     db.close_connexion()
-    logger.log("connexion_table", ct.format_current("closing"))
-    logger.log("connexion_table", ct.format_long())
+    logger.log("connexion_table", ct.format_current("closing"), 1)
+    logger.log("connexion_table", ct.format_long(), 1)
 
 
 if __name__ == "__main__":
