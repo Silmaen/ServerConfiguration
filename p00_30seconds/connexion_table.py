@@ -18,6 +18,9 @@ def main(dry_run: bool = False):
     """
     # to  lighten th log files... logger.log("connexion_table","check connexion table")
     # initialize data and connect to mysql database
+
+    from common.CodeTimer import CodeTimer
+    ct = CodeTimer("connexion_table")
     db = MyDataBase(MySQLParams, "")
     if not db.db_connexion():
         logger.log_error("connexion_table", "No connexion to MySQL database!")
@@ -35,6 +38,7 @@ def main(dry_run: bool = False):
         db.bd_actualize()
     # close connexion to the server
     db.close_connexion()
+    logger.log("connexion_table", ct.format_long())
 
 
 if __name__ == "__main__":
