@@ -52,10 +52,19 @@ class CodeTimer:
         else:
             return self.long
 
-    def format_long(self):
+    def format_long(self, name: str = ""):
         """
         format a string of long with units
         :return: long displayed with unit
         """
-
+        if name not in ["", None]:
+            self.name = name
         return self.name + " {:.6f} s".format(self.get_long())
+
+    def format_current(self, name: str = ""):
+        """
+        format a string of current timer with units
+        :return: long displayed with unit
+        """
+        import time
+        return name + " {:.6f} s".format(time.time() - self.start)

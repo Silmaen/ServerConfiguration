@@ -74,8 +74,6 @@ def main(dry_run: bool = False):
     :param dry_run: if the script should be run without system modification
     :return:
     """
-    from common.CodeTimer import CodeTimer
-    ct = CodeTimer("connection check")
     if os.path.exists(datastate):
         f = open(datastate, "r")
         lines = f.readlines()
@@ -103,7 +101,6 @@ def main(dry_run: bool = False):
         for w in wan.keys():
             f.write(w + " " + b2o(wan[w]["state"]) + "\n")
         f.close()
-    logger.log("connexion_check", ct.format_long(), 0)
 
 
 if __name__ == "__main__":
