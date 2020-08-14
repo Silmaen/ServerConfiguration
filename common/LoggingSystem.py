@@ -3,6 +3,7 @@ all logging functions here
 """
 from common.AllDefaultParameters import *
 from common.databasehelper import DatabaseHelper
+import traceback
 import datetime
 import os
 
@@ -15,7 +16,9 @@ class ErrorData:
     """
     class to exchange error data with the database
     """
-    def __init__(self, who: str = "", message: str = "", time: datetime.datetime = datetime.datetime.now(), _id: int = 0):
+
+    def __init__(self, who: str = "", message: str = "", time: datetime.datetime = datetime.datetime.now(),
+                 _id: int = 0):
         self.who = who
         self.message = message
         self.time = time
@@ -82,13 +85,15 @@ class Logger:
     """
     class used to log messages (singleton design pattern)
     """
+
     def __init__(self, destination=None, level: int = -1):
         self.destination = None
         self.level = -1
         self.isfile = False
         if not destination and level < 0:
             if not os.path.exists(log_data):
-                print("No default value for logging")
+                print("Value file for logging does not exist!")
+                print("".join(traceback.format_stack()))
                 self.__set_parameter()
                 return
             else:
@@ -96,7 +101,8 @@ class Logger:
                 lines = fd.readlines()
                 fd.close()
                 if len(lines) == 0:
-                    print("Empty datafile for logging")
+                    print("Value file for logging is empty")
+                    print("".join(traceback.format_stack()))
                     self.__set_parameter()
                 for line in lines:
                     if len(line.strip()) == 0 or line.strip().startswith("#"):
@@ -111,8 +117,9 @@ class Logger:
                         print("Exception in decoding log level: " + str(err.with_traceback()))
                     break
                 if self.level < 0:
-                    print("Badly-formed datafile for logging")
+                    print("Badly-formed Value file for logging")
                     print(lines)
+                    print("".join(traceback.format_stack()))
                     self.__set_parameter()
                     return
         else:
@@ -147,32 +154,33 @@ class Logger:
         log the message to the destination
         :param message: the message to log as a string
         :param who: the sender of the message
-        :param level: the level of the message (level higher than the defined one will not be printed)
+        :param level: the level of the message (level higher than the defined one will not be log)
         """
         import time
         level = min(abs(level), len(message_level_decorator))
         if who == "" or level > self.level:
             return
-        to_print = time.strftime("%Y %h %d %H:%M:%S") + " [" + who + "] : " + message_level_decorator[level] + message
+        to_display = time.strftime("%Y %h %d %H:%M:%S") + "[" + who + "] : " + message_level_decorator[level] + message
         if self.isfile:
             if not os.path.exists(self.destination):
                 self.new_log()
             f = open(self.destination, "a")
-            f.write(to_print + "\n")
+            f.write(to_display + "\n")
             f.close()
         else:
-            print(to_print)
+            print(to_display)
+            print("".join(traceback.format_stack()))
 
     def log_error(self, who: str, message: str):
         """
         log a error
-        it will print into the log file as will do the log function bur also will add an entry in the error data base
+        it will add into the log file as will do the log function bur also will add an entry in the error data base
         :param who: sender of the error
         :param message: the error message
         """
         self.log(who, message, 0)
         if is_system_production():
-            error = ErrorData(who, message)
+            error = ErrorData(who, message + "\n" + "".join(traceback.format_stack()))
             error.add_to_database()
 
 
@@ -186,10 +194,11 @@ def get_error_list(start_time: datetime.datetime = datetime.datetime.now(),
     """
     true_end_time = max(start_time, end_time)
     true_start_time = min(start_time, end_time)
-    if true_end_time - true_start_time < datetime.timedelta(seconds = 1):
+    if true_end_time - true_start_time < datetime.timedelta(seconds=1):
         true_end_time = true_start_time
-        true_start_time = true_end_time - datetime.timedelta(days = 1)
-    ret, content = db_helper.select("ErrorList", "WHERE `time` BETWEEN '" + str(true_start_time) + "' AND '" + str(true_end_time) + "'")
+        true_start_time = true_end_time - datetime.timedelta(days=1)
+    ret, content = db_helper.select("ErrorList", "WHERE `time` BETWEEN '" + str(true_start_time) + "' AND '" + str(
+        true_end_time) + "'")
     if not ret:
         return []
     ret = []

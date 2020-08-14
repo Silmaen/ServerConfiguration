@@ -6,22 +6,7 @@ import MySQLdb
 import copy
 
 
-def print_machine_list(dict_list):
-    print('{:<20}{:<16}{:<18}{:<9}{:<25}{:<25}'.format("Name", "IP", "MAC", "external", "starting Time",
-                                                       "stoping time"))
-    for key, val in dict_list.items():
-        if "Stop" not in val:
-            print('{:<20}{:<16}{:<18}{:<9}{:<25}{:<25}'.format(str(key), str(val["IP"]), str(val["MAC"]),
-                                                               str(val["OutMachine"]),
-                                                               str(val["Start"]).split(".")[0], "connected"))
-        else:
-            print('{:<20}{:<16}{:<18}{:<9}{:<25}{:<25}'.format(str(key), str(val["IP"]), str(val["MAC"]),
-                                                               str(val["OutMachine"]),
-                                                               str(val["Start"]).split(".")[0],
-                                                               str(val["Stop"]).split(".")[0]))
-
-
-def print_machine_list_duration(dict_list):
+def get_machine_list_duration(dict_list):
     lines = ['{:<20}{:<16}{:<18}{:<9}{:<25}{:<25}'.format("Name", "IP", "MAC", "external", "Connexion duration",
                                                           "status")]
     for key, val in dict_list.items():
@@ -173,7 +158,6 @@ class MyDataBase:
             cmd += ", '" + str(info["Stop"]).split(".")[0] + "'"
             cmd += ", '" + str(info["OutMachine"]) + "'"
             cmd += ");"
-            # print(cmd)
             res, _ = self.db_request(cmd)
             if not res:
                 logger.log_error(self.script, "ERROR adding entry to database, cmd=" + cmd)
@@ -197,7 +181,6 @@ class MyDataBase:
                 cmd += ", `ConnexionStart` = '" + str(info["Start"]).split(".")[0] + "'"
                 cmd += ", `OutMachine` = '" + str(info["OutMachine"]) + "'"
                 cmd += " WHERE `ActiveMachine`.`MachineName` = '" + str(mach) + "';"
-                # print(cmd)
                 res, _ = self.db_request(cmd)
                 if not res:
                     logger.log_error(self.script, "ERROR updating entry in database, cmd=" + cmd)
@@ -212,7 +195,6 @@ class MyDataBase:
                 cmd += ", '" + str(info["Start"]).split(".")[0] + "'"
                 cmd += ", '" + str(info["OutMachine"]) + "'"
                 cmd += ");"
-                # print(cmd)
                 res, _ = self.db_request(cmd)
                 if not res:
                     logger.log_error(self.script, "ERROR adding entry to database, cmd=" + cmd)
