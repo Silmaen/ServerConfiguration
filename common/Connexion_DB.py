@@ -7,7 +7,7 @@ import copy
 
 
 def get_machine_list_duration(dict_list):
-    lines = ['{:<20}{:<16}{:<18}{:<9}{:<25}{:<25}'.format("Name", "IP", "MAC", "external", "Connexion duration",
+    lines = ['{:<20}{:<16}{:<18}{:<9}{:<25}{:<25}'.format("Name", "IP", "MAC", "external", "Duration",
                                                           "status")]
     for key, val in dict_list.items():
         if "Stop" not in val:

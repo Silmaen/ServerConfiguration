@@ -94,7 +94,14 @@ def disk():
     if len(lines) == 0:
         return
     logger.log("daily", "Disks:\n" + "\n".join(lines))
-    add_paragraph_with_items("Disks", lines=lines)
+    ct = []
+    r = []
+    for line in lines:
+        if len(ct) == 0:
+            ct = line.split(maxsplit=5)
+            continue
+        r.append(line.split(maxsplit=5))
+    add_paragraph_with_array("Disks", col_titles=ct, rows=r)
 
 
 MySQLParams = {
@@ -110,13 +117,14 @@ def network():
     compute network statistics
     :return:
     """
-    ret, lines = system_exec("netstat -ibhn")
-    if len(lines) == 0:
-        return
-    logger.log("daily", "Network:")
-    logger.log("daily", "\n".join(lines))
-    add_mail_line("## Network ##")
-    add_paragraph_with_lines("Statistics", 3, lines=lines)
+    if False: # DEACTIVATED FOR NOW
+        ret, lines = system_exec("netstat -ibhn")
+        if len(lines) == 0:
+            return
+        logger.log("daily", "Network:")
+        logger.log("daily", "\n".join(lines))
+        add_mail_line("## Network ##")
+        add_paragraph_with_lines("Statistics", 3, lines=lines)
     ending = datetime.datetime.now()
     starting = ending - datetime.timedelta(days=1)
     DB = MyDataBase(MySQLParams, "ClientStatistic")
@@ -127,7 +135,14 @@ def network():
     lines = get_machine_list_duration(machine_list)
     logger.log("daily", "Connected machines:")
     logger.log("daily", "\n".join(lines))
-    add_paragraph_with_lines("Connected machines", 3, lines=lines)
+    ct = []
+    r = []
+    for line in lines:
+        if len(ct) == 0:
+            ct = line.split()
+            continue
+        r.append(line.split())
+    add_paragraph_with_array("Connected machines", 3, col_title=ct, rows=r)
 
 
 def check_daily_errors():
