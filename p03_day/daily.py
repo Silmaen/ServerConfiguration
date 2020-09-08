@@ -117,13 +117,13 @@ def network():
     compute network statistics
     :return:
     """
-    if False: # DEACTIVATED FOR NOW
+    logger.log("daily", "Network:")
+    add_mail_line("## Network ##")
+    if False:  # DEACTIVATED FOR NOW
         ret, lines = system_exec("netstat -ibhn")
         if len(lines) == 0:
             return
-        logger.log("daily", "Network:")
         logger.log("daily", "\n".join(lines))
-        add_mail_line("## Network ##")
         add_paragraph_with_lines("Statistics", 3, lines=lines)
     ending = datetime.datetime.now()
     starting = ending - datetime.timedelta(days=1)
@@ -142,7 +142,7 @@ def network():
             ct = line.split()
             continue
         r.append(line.split())
-    add_paragraph_with_array("Connected machines", 3, col_title=ct, rows=r)
+    add_paragraph_with_array("Connected machines", 3, col_titles=ct, rows=r)
 
 
 def check_daily_errors():
