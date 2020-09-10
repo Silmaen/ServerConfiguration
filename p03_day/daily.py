@@ -135,14 +135,8 @@ def network():
     lines = get_machine_list_duration(machine_list)
     logger.log("daily", "Connected machines:")
     logger.log("daily", "\n".join(lines))
-    ct = []
-    r = []
-    for line in lines:
-        if len(ct) == 0:
-            ct = line.split()
-            continue
-        r.append(line.split())
-    add_paragraph_with_array("Connected machines", 3, col_titles=ct, rows=r)
+    add_paragraph_with_array("Connected machines", 3, col_titles=get_machine_list_column(),
+                             rows=get_machine_list_items(machine_list))
 
 
 def check_daily_errors():

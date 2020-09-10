@@ -188,7 +188,7 @@ def add_paragraph_with_array(title: str, level: int = 2, col_titles=None, rows=N
     fd.write("\n")
     for r in rows:
         if len(r) != len(col_titles):
-            logger.log_error("Problems with columns")
+            logger.log_error("mailing", "Problems with columns: wrong dimension: " + str(r) + str(col_title))
             continue
         fd.write("> |")
         for a in r:

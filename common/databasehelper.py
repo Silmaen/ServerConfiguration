@@ -28,7 +28,7 @@ Valid_Tables = [
 database_error_file = os.path.join(log_dir, "db_errors.log")
 
 
-def log_error(message: str):
+def log_db_error(message: str):
     """
     special error
     :param message:
@@ -59,17 +59,17 @@ class DatabaseHelper:
         try:
             self.__con = MySQLdb.connect(**MySQLParams)
         except MySQLdb.Error as err:
-            log_error(str(err))
+            log_db_error(str(err))
             self.__con = None
             self.__error_code = 1
             return
         except Exception as err:
-            log_error(str(err))
+            log_db_error(str(err))
             self.__con = None
             self.__error_code = 2
             return
         if not self.__con:
-            log_error("Unknown error during connexion")
+            log_db_error("Unknown error during connexion")
             self.__error_code = 3
             return
         self.__cur = self.__con.cursor()
@@ -83,7 +83,7 @@ class DatabaseHelper:
             try:
                 self.__con.close()
             except MySQLdb.Error as err:
-                log_error(str(err))
+                log_db_error(str(err))
         self.__cur = None
         self.__con = None
         self.__error_code = 0
@@ -96,7 +96,7 @@ class DatabaseHelper:
         """
         if table_name in Valid_Tables:
             return True
-        log_error("invalid table Name '" + table_name +
+        log_db_error("invalid table Name '" + table_name +
                   "' valid names are: [" + " ".join(Valid_Tables) + "]")
         self.__error_code = 4
         return False
@@ -110,11 +110,11 @@ class DatabaseHelper:
             self.__cur.execute(request)
             self.__con.commit()
         except MySQLdb.Error as e:
-            log_error("MySQLdb Error " + str(e.args[0]) + ": " + str(e.args[1]) + " request: " + request)
+            log_db_error("MySQLdb Error " + str(e.args[0]) + ": " + str(e.args[1]) + " request: " + request)
             self.__close_connection()
             return False
         except Exception as err:
-            log_error("Unknown Error for querry: '" + str(request) + "': " + str(err))
+            log_db_error("Unknown Error for querry: '" + str(request) + "': " + str(err))
             self.__close_connection()
             return False
         return True
@@ -134,7 +134,7 @@ class DatabaseHelper:
             return False
         for n in content:
             if n not in col_names:
-                log_error("Bad item for insert into " + table_name + " '" + n +
+                log_db_error("Bad item for insert into " + table_name + " '" + n +
                           "' valid items are: [" + ",".join(col_names) + "]")
                 return False
         return True
@@ -193,7 +193,7 @@ class DatabaseHelper:
             return False
         req = "INSERT INTO `" + table_name + "` "
         req += "(" + ", ".join(["`" + str(s) + "`" for s in content.keys()]) + ")"
-        req += " VALUES (" + ", ".join(["'" + str(content[s]) + "'" for s in content.keys()]) + ")"
+        req += " VALUES (" + ", ".join(["'" + str(content[s]).replace("'", "\\'") + "'" for s in content.keys()]) + ")"
         return self.__request(req)
 
     def modify(self, table_name: str, content: dict):
@@ -209,12 +209,12 @@ class DatabaseHelper:
         if not self.__check_column(table_name, content):
             return False
         if 'ID' not in content:
-            log_error("Modifiy error: the ID of the item to modify is not set")
+            log_db_error("Modifiy error: the ID of the item to modify is not set")
         if not self.__exists_item(table_name, content['ID']):
-            log_error("Modifiy warning: item with ID " + str(content['ID']) + " does not exists ")
+            log_db_error("Modifiy warning: item with ID " + str(content['ID']) + " does not exists ")
             return False
         req = "UPDATE `" + table_name + "` SET " + \
-              ", ".join(["`" + key + "` = '" + str(val) + "'" for key, val in content.items()]) + \
+              ", ".join(["`" + key + "` = '" + str(val).replace("'", "\\'") + "'" for key, val in content.items()]) + \
               " WHERE `" + table_name + "`.`ID` = " + str(content["ID"])
         return self.__request(req)
 
@@ -229,7 +229,7 @@ class DatabaseHelper:
         if not self.__check_table_name(table_name):
             return False
         if not self.__exists_item(table_name, id_to_delete):
-            log_error("Delete warning: item with ID " + str(id_to_delete) + " does not exists ")
+            log_db_error("Delete warning: item with ID " + str(id_to_delete) + " does not exists ")
             return False
         req = "DELETE FROM `" + table_name + "` WHERE `" + table_name + "`.`ID` = " + str(id_to_delete)
         return self.__request(req)

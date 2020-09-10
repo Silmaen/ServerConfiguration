@@ -21,6 +21,20 @@ def get_machine_list_duration(dict_list):
     return lines
 
 
+def get_machine_list_column():
+    return ["Name", "IP", "MAC", "external", "Duration", "status"]
+
+
+def get_machine_list_items(dict_list):
+    ret = []
+    for key, val in dict_list.items():
+        if "Stop" not in val:
+            ret.append([str(key), str(val["IP"]), str(val["MAC"]), str(val["OutMachine"]), str(val["Duration"]), "connected"])
+        else:
+            ret.append([str(key), str(val["IP"]), str(val["MAC"]), str(val["OutMachine"]), str(val["Duration"]), "Disconnected"])
+    return ret
+
+
 class MyDataBase:
     def __init__(self, params, script):
         self.__con = None
