@@ -78,7 +78,7 @@ class ErrorData:
         return the data id of this item (the last one in case of duplication, or -1 if not exists
         :return: the id of
         """
-        return db_helper.getId("ErrorList", self.to_dict())
+        return db_helper.get_id("ErrorList", self.to_dict())
 
 
 class Logger:
@@ -114,7 +114,7 @@ class Logger:
                         self.level = int(line)
                     except Exception as err:
                         self.level = -1
-                        print("Exception in decoding log level: " + str(err.with_traceback()))
+                        print("Exception bad log level: " + str(err) + "\n" + "\n".join(traceback.format_stack()))
                     break
                 if self.level < 0:
                     print("Badly-formed Value file for logging")

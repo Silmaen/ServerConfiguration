@@ -3,12 +3,14 @@
 the daily procedure (coming from OpenBSD)
 """
 import shutil
-
-
-from common.Connexion_DB import *
+import os
+import time
+import datetime
+from common.maintenance import system_exec, logger
 from common.LoggingSystem import get_error_list
-from common.MailingSystem import add_paragraph_with_items, add_paragraph, add_paragraph_with_array, add_mail_line, \
+from common.MailingSystem import add_paragraph_with_items, add_paragraph, add_paragraph_with_array, \
     add_paragraph_with_lines
+from common.machine import get_current_day_machines
 
 
 def setheaderlines():
@@ -117,26 +119,10 @@ def network():
     compute network statistics
     :return:
     """
-    logger.log("daily", "Network:")
-    add_mail_line("## Network ##")
-    if False:  # DEACTIVATED FOR NOW
-        ret, lines = system_exec("netstat -ibhn")
-        if len(lines) == 0:
-            return
-        logger.log("daily", "\n".join(lines))
-        add_paragraph_with_lines("Statistics", 3, lines=lines)
-    ending = datetime.datetime.now()
-    starting = ending - datetime.timedelta(days=1)
-    DB = MyDataBase(MySQLParams, "ClientStatistic")
-    if not DB.db_connexion():
-        logger.log("ClientStatistics", "Unable to get the database")
-        return
-    machine_list = DB.get_connexions_between(starting, ending)
-    lines = get_machine_list_duration(machine_list)
+    titles, rows = get_current_day_machines()
     logger.log("daily", "Connected machines:")
-    logger.log("daily", "\n".join(lines))
-    add_paragraph_with_array("Connected machines", 3, col_titles=get_machine_list_column(),
-                             rows=get_machine_list_items(machine_list))
+    logger.log("daily", "\n".join(["\t".join(titles), ["\t".join(r) for r in rows]]))
+    add_paragraph_with_array("Connected machines", col_titles=titles, rows=rows)
 
 
 def check_daily_errors():

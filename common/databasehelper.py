@@ -6,17 +6,17 @@ import MySQLdb
 
 if is_system_production():
     MySQLParams = {
-        'host'  : "localhost",
-        'user'  : "robot",
+        'host': "localhost",
+        'user': "robot",
         'passwd': "Robot123",
-        'db'    : "administration"
+        'db': "administration"
     }
 else:
     MySQLParams = {
-        'host'  : "localhost",
-        'user'  : "robot",
+        'host': "localhost",
+        'user': "robot",
         'passwd': "Robot123",
-        'db'    : "administration_test"
+        'db': "administration_test"
     }
 
 Valid_Tables = [
@@ -97,7 +97,7 @@ class DatabaseHelper:
         if table_name in Valid_Tables:
             return True
         log_db_error("invalid table Name '" + table_name +
-                  "' valid names are: [" + " ".join(Valid_Tables) + "]")
+                     "' valid names are: [" + " ".join(Valid_Tables) + "]")
         self.__error_code = 4
         return False
 
@@ -135,7 +135,7 @@ class DatabaseHelper:
         for n in content:
             if n not in col_names:
                 log_db_error("Bad item for insert into " + table_name + " '" + n +
-                          "' valid items are: [" + ",".join(col_names) + "]")
+                             "' valid items are: [" + ",".join(col_names) + "]")
                 return False
         return True
 
@@ -189,7 +189,7 @@ class DatabaseHelper:
             return False
         if not self.__check_column(table_name, content):
             return False
-        if unique and self.getId(table_name, content, False) > 0:
+        if unique and self.get_id(table_name, content, False) > 0:
             return False
         req = "INSERT INTO `" + table_name + "` "
         req += "(" + ", ".join(["`" + str(s) + "`" for s in content.keys()]) + ")"
@@ -200,7 +200,7 @@ class DatabaseHelper:
         """
         modify an entry in the Database
         :param table_name: the table to search for entry
-        :param content: the modified content (could be partial)
+        :param content: the modified content (could be partial) (must contain the ID of the entry)
         :return:
         """
         # UPDATE `table_name` SET `filters.keys()` = filters.values() WHERE `table_name`.`Id` = content['Id']
@@ -234,7 +234,7 @@ class DatabaseHelper:
         req = "DELETE FROM `" + table_name + "` WHERE `" + table_name + "`.`ID` = " + str(id_to_delete)
         return self.__request(req)
 
-    def getId(self, table_name: str, know_content: dict, unique: bool = True):
+    def get_id(self, table_name: str, know_content: dict, unique: bool = True):
         """
         retrieve id of an element
         :param table_name: the name of the table to search in

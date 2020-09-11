@@ -6,6 +6,7 @@ from common.databasehelper import DatabaseHelper
 from common.maintenance import logger, system_exec
 
 timeFormat = "%Y-%m-%d %H:%M:%S"
+extender_mac_prefix = "02:0f:b5:"
 
 
 def mac_compare(mac1: str, mac2: str):
@@ -19,11 +20,25 @@ def mac_compare(mac1: str, mac2: str):
     m2 = mac2.lower()
     if m1 == m2:
         return True
-    dm1 = "02:0f:b5:" + m1[9:]
-    dm2 = "02:0f:b5:" + m2[9:]
+    dm1 = extender_mac_prefix + m1[9:]
+    dm2 = extender_mac_prefix + m2[9:]
     if dm1 == m2 or dm2 == m1:
         return True
     return False
+
+
+def get_true_mac(mac1: str, mac2: str):
+    """
+    get the real mac between the 2 given (base on extender mac change)
+    :param mac1:
+    :param mac2:
+    :return:
+    """
+    if not mac_compare(mac1, mac2):
+        return "00:00:00:00:00:00"
+    if mac1.startswith(extender_mac_prefix):
+        return mac2
+    return mac2
 
 
 def str_is_ip(string: str):
@@ -32,17 +47,11 @@ def str_is_ip(string: str):
     :param string: the string to test
     :return: True if the string has a valid IP format
     """
-    items = string.split(".")
-    if len(items) != 4:
-        return False
+    import socket
     try:
-        for i in range(4):
-            items[i] = int(items[i])
-    except:
+        socket.inet_aton(string)
+    except OSError:
         return False
-    for i in items:
-        if i < 0 or i > 255:
-            return False
     return True
 
 
@@ -54,6 +63,15 @@ def str_is_mac(string: str):
     """
     import re
     return re.match("[0-9a-f]{2}([-:]?)[0-9a-f]{2}(\\1[0-9a-f]{2}){4}$", string.lower())
+
+
+def is_valid_mac(mac: str):
+    """
+    return True if the mac address is a valid one
+    :param mac:
+    :return:
+    """
+    return mac != "00:00:00:00:00:00" and str_is_mac(mac)
 
 
 def find_in_lease(ip: str, mac: str):
@@ -105,10 +123,13 @@ class Machine:
         self.ip = ip
         self.outmachine = outmachine
         self.started = started
+        self.disconnected = started
+        self.active = True
         self.inDB = False
         self.inDNS = False
         self.inDNStemplate = False
         self.inLease = False
+        self.better_mac = False
 
     def __str__(self):
         ret = [" ", "D"][self.inDB] + [" ", "N"][self.inDNS] + [" ", "L"][self.inLease] + " " + \
@@ -117,6 +138,13 @@ class Machine:
             ret += " "
         ret += " " + self.name
         return ret
+
+    def __lt__(self, other):
+        import socket
+        return socket.inet_aton(self.ip) < socket.inet_aton(other.ip)
+
+    def __eq__(self, other):
+        return mac_compare(self.mac, other.mac) and self.ip == other.ip and self.name == other.name
 
     def set_time(self, time: str):
         """
@@ -140,10 +168,13 @@ class Machine:
         try:
             self.name, a, b = socket.gethostbyaddr(self.ip)
             self.inDNS = True
-        except:
+        except Exception as err:
             self.name = find_in_lease(self.ip, self.mac)
             if self.name != "Not Found":
                 self.inLease = True
+            else:
+                logger.log_error("Machine", "Problem while getting name of machine at ip: " + self.ip +
+                                 " err:" + str(err))
 
     def get_short_name(self):
         """
@@ -158,13 +189,6 @@ class Machine:
         :return: true if dns update is required
         """
         return self.inLease and not self.inDNS
-
-    def need_db_update(self):
-        """
-        Determine if this machine need to be updated in db
-        :return: true if the machine is not actualized with db
-        """
-        return not self.inDB and "srv.argawaen.net" not in self.name
 
     def make_dns_entry(self):
         """
@@ -197,6 +221,28 @@ def get_active_machine_db():
     for m in machines:
         mm = Machine(m["MachineName"], m["MAC Address"], m["IP"], m["OutMachine"], m["ConnexionStart"])
         mm.inDB = True
+        mm.active = False
+        ret.append(mm)
+    return ret
+
+
+def get_connected_since(start):
+    """
+    get active machines in DB
+    :param start:
+    :return: list of machine in DB
+    """
+    db = DatabaseHelper()
+    ret, machines = db.select("ConnexionArchive", " WHERE `ConnexionEnd` > '" + str(start) +
+                              "' ORDER BY `MachineName` ASC")
+    if not ret:
+        logger.log_error("ConnexionArchiveDb", "Connexion problems", 0)
+        return []
+    ret = []
+    for m in machines:
+        mm = Machine(m["MachineName"], m["MAC Address"], m["IP"], m["OutMachine"], m["ConnexionStart"])
+        mm.active = False
+        mm.disconnected = m["ConnexionEnd"]
         ret.append(mm)
     return ret
 
@@ -206,7 +252,8 @@ def get_connected_machines():
     get the actual list of connected machines
     :return: list of machine connected
     """
-    ret, lines = system_exec("arp -an")
+    import socket
+    ret, lines = system_exec("arp -a")
     if ret != 0:
         logger.log_error("Machine", "unable to find connected machine", 0)
         return []
@@ -214,10 +261,133 @@ def get_connected_machines():
     for line in lines:
         if line.startswith("Host"):
             continue
-        items = line.split(" ")
-        if not str_is_mac(items[1]):  # fake connection
+        host, mac, conif, timing = line.split(None, 4)
+        if "(incomplete)" in mac:
             continue
-        mach = Machine(ip=items[0], mac=items[1], outmachine=(items[2] == "re0"))
-        mach.retrieve_name_from_ip()
+        if 'Expired' in timing:
+            continue
+        if "srv.argawaen.net" in host:  # ignore self
+            continue
+        ip = socket.gethostbyname(host)
+        mach = Machine(name=host, ip=ip, mac=mac, outmachine=(conif == "re0"))
+        mach.active = True
         ret.append(mach)
     return ret
+
+
+def get_compared_machine_lists():
+    """
+    merge the list of machines
+
+    :return:
+    """
+    m_db = get_active_machine_db()
+    m_arp = get_connected_machines()
+    ret = []
+    # treat machines that are in both lists
+    for mach in m_db:
+        found = False
+        # treat machines that are in both lists
+        for mach2 in m_arp:
+            if mach == mach2:
+                mach.active = True
+                mac = get_true_mac(mach.mac, mach2.mac)
+                if is_valid_mac(mac) and mac != mach.mac:
+                    mach.mac = mac
+                    mach.better_mac = True
+                ret.append(mach)
+                found = True
+                break
+        if found:
+            continue
+        # treat machine that are in DB but no more active
+        mach.active = False
+        ret.append(mach)
+    # Treat newly active machine
+    for mach in m_arp:
+        if mach in ret:  # already treated
+            continue
+        ret.append(mach)
+    ret.sort()
+    return ret
+
+
+def update_active_machine_database():
+    """
+    compare lists of machine and update the database accordingly
+    :return:
+    """
+    machines = get_compared_machine_lists()
+    db = DatabaseHelper()
+    for machine in machines:
+        mac_dict = {
+                "MachineName": machine.name,
+                "IP": machine.ip,
+                "MAC Address": machine.mac,
+                "ConnexionStart": machine.started,
+                "OutMachine": [0, 1][machine.outmachine]
+            }
+        if machine.inDB:
+            e_id = db.get_id("ActiveMachine", mac_dict)
+            if e_id < 0:
+                logger.log_error("machine compare", "ERROR: unable to get ID for " + str(machine))
+                continue
+            if machine.active:
+                # machine already in DB ans still active: does the mac to be updated?
+                mac_dict["ID"] = e_id
+                if machine.better_mac:
+                    db.modify("ActiveMachine", mac_dict)
+                continue
+            else:
+                # newly disconnected machine
+                db.delete("ActiveMachine", e_id)
+                mac_dict["ConnexionEnd"] = datetime.datetime.now()
+                db.insert("ConnexionArchive", mac_dict)
+        else:
+            if machine.active:
+                # newly connected machine
+                db.insert("ActiveMachine", mac_dict)
+            else:
+                # machine not in DB and not Active: should notappend
+                logger.log_error("machine compare", "SHOULD NOT HAPPEND: machine badly formed: " + str(machine))
+
+
+def get_current_day_machines():
+    """
+    check database for the current day content of machine database
+    :return:
+    """
+    cols = ["Name", "IP", "MAC", "external", "Duration", "status"]
+    active_machines = get_active_machine_db()
+    now = datetime.datetime.now()
+    day_begin = datetime.datetime(now.year, now.month, now.day)
+    logout_machines = get_connected_since(day_begin)
+    ret = []
+    for machine in active_machines:
+        ret.append([
+            machine.name,
+            machine.ip,
+            machine.mac,
+            machine.outmachine,
+            now - machine.started,
+            "Connected"
+        ])
+    for machine in logout_machines:
+        if machine not in ret:
+            ret.append([
+                machine.name,
+                machine.ip,
+                machine.mac,
+                machine.outmachine,
+                now - machine.started,
+                "Disconnected"
+            ])
+        else:
+            for i in range(len(ret)):
+                if ret[i] != machine:
+                    continue
+                if not is_valid_mac(ret[i][2]):
+                    ret[i][2] = get_true_mac(machine.mac, ret[i][2])
+                ret[i][3] += machine.disconnected - machine.started
+                break
+    return cols, ret
