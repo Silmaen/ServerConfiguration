@@ -268,7 +268,11 @@ def get_connected_machines():
             continue
         if "srv.argawaen.net" in host:  # ignore self
             continue
-        ip = socket.gethostbyname(host)
+        try:
+            ip = socket.gethostbyname(host)
+        except Exception as err:
+            logger.log_error("Machine", "unable to machine IP: '" + host + "' :" + str(err), 0)
+            ip = "0.0.0.0"
         mach = Machine(name=host, ip=ip, mac=mac, outmachine=(conif == "re0"))
         mach.active = True
         ret.append(mach)
