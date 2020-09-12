@@ -252,7 +252,6 @@ def get_connected_machines():
     get the actual list of connected machines
     :return: list of machine connected
     """
-    import socket
     ret, lines = system_exec("arp -a")
     if ret != 0:
         logger.log_error("Machine", "unable to find connected machine")
