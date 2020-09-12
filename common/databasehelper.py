@@ -59,12 +59,12 @@ class DatabaseHelper:
         try:
             self.__con = MySQLdb.connect(**MySQLParams)
         except MySQLdb.Error as err:
-            log_db_error(str(err))
+            log_db_error("MySQL Error during connexion: " + str(err))
             self.__con = None
             self.__error_code = 1
             return
         except Exception as err:
-            log_db_error(str(err))
+            log_db_error("Unknown Error during connexion: " + str(err))
             self.__con = None
             self.__error_code = 2
             return
@@ -83,7 +83,7 @@ class DatabaseHelper:
             try:
                 self.__con.close()
             except MySQLdb.Error as err:
-                log_db_error(str(err))
+                log_db_error("MySQL Error during closing: " + str(err))
         self.__cur = None
         self.__con = None
         self.__error_code = 0

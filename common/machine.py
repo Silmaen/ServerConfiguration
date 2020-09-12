@@ -261,10 +261,10 @@ def get_connected_machines():
     for line in lines:
         if line.startswith("Host"):
             continue
-        host, mac, conif, timing = line.split(None, 4)
+        host, mac, conif, timing = line.split(None, 3)
         if "(incomplete)" in mac:
             continue
-        if 'Expired' in timing:
+        if 'expired' in timing:
             continue
         if "srv.argawaen.net" in host:  # ignore self
             continue
