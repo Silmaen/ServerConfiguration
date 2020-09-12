@@ -255,7 +255,7 @@ def get_connected_machines():
     import socket
     ret, lines = system_exec("arp -a")
     if ret != 0:
-        logger.log_error("Machine", "unable to find connected machine", 0)
+        logger.log_error("Machine", "unable to find connected machine")
         return []
     ret = []
     for line in lines:
@@ -271,7 +271,7 @@ def get_connected_machines():
         try:
             ip = socket.gethostbyname(host)
         except Exception as err:
-            logger.log_error("Machine", "unable to machine IP: '" + host + "' :" + str(err), 0)
+            logger.log_error("Machine", "unable to machine IP: '" + host + "' :" + str(err))
             ip = "0.0.0.0"
         mach = Machine(name=host, ip=ip, mac=mac, outmachine=(conif == "re0"))
         mach.active = True
