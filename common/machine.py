@@ -257,7 +257,15 @@ def get_connected_machines():
     if ret != 0:
         logger.log_error("Machine", "unable to find connected machine")
         return []
+    ret, lines2 = system_exec("arp -an")
+    if ret != 0:
+        logger.log_error("Machine", "unable to find connected machine")
+        return []
     ret = []
+    ips = {}
+    for line in lines2:
+        host, mac, _ = line.split(None, 2)
+        ips[mac] = host
     for line in lines:
         if line.startswith("Host"):
             continue
@@ -268,11 +276,14 @@ def get_connected_machines():
             continue
         if "srv.argawaen.net" in host:  # ignore self
             continue
+        ip = ips[mac]
+        """
         try:
             ip = socket.gethostbyname(host)
         except Exception as err:
             logger.log_error("Machine", "unable to machine IP: '" + host + "' :" + str(err))
-            ip = "0.0.0.0"
+            ip = "0.0.0.0" 
+        """
         mach = Machine(name=host, ip=ip, mac=mac, outmachine=(conif == "re0"))
         mach.active = True
         ret.append(mach)
