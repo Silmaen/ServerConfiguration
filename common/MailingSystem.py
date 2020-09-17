@@ -180,7 +180,7 @@ def add_paragraph_with_array(title: str, level: int = 2, col_titles=None, rows=N
     # array
     fd.write("> |")
     for col_title in col_titles:
-        fd.write(" " + col_title + " |")
+        fd.write(" " + str(col_title) + " |")
     fd.write("\n")
     fd.write("> |")
     for col_title in col_titles:
@@ -188,11 +188,11 @@ def add_paragraph_with_array(title: str, level: int = 2, col_titles=None, rows=N
     fd.write("\n")
     for r in rows:
         if len(r) != len(col_titles):
-            logger.log_error("mailing", "Problems with columns: wrong dimension: " + str(r) + str(col_title))
+            logger.log_error("mailing", "Problems with columns: wrong dimension: " + str(r) + str(col_titles))
             continue
         fd.write("> |")
         for a in r:
-            fd.write(" " + a + " |")
+            fd.write(" " + str(a) + " |")
         fd.write("\n")
     fd.write(">\n")
     # post message
