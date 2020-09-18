@@ -169,7 +169,7 @@ class Logger:
             f.close()
         else:
             print(to_display)
-            print("".join(traceback.format_stack()))
+            #print("".join(traceback.format_stack()))
 
     def log_error(self, who: str, message: str):
         """
