@@ -215,7 +215,7 @@ def get_active_machine_db():
     db = DatabaseHelper()
     ret, machines = db.select("ActiveMachine")
     if not ret:
-        logger.log_error("ActiveMachineDb", "Connexion problems", 0)
+        logger.log_error("ActiveMachineDb", "Connexion problems")
         return []
     ret = []
     for m in machines:
@@ -236,7 +236,7 @@ def get_connected_since(start):
     ret, machines = db.select("ConnexionArchive", " WHERE `ConnexionEnd` > '" + str(start) +
                               "' ORDER BY `MachineName` ASC")
     if not ret:
-        logger.log_error("ConnexionArchiveDb", "Connexion problems", 0)
+        logger.log_error("ConnexionArchiveDb", "Connexion problems")
         return []
     ret = []
     for m in machines:
