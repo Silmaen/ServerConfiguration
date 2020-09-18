@@ -217,6 +217,8 @@ def generate_htmlfile():
     """
     convert the md file into html
     """
+    if not os.path.exists(md_mail_file):
+        return
     fp = open(md_mail_file)
     lines = fp.readlines()
     fp.close()
