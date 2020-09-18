@@ -121,7 +121,7 @@ def network():
     """
     titles, rows = get_current_day_machines()
     logger.log("daily", "Connected machines:")
-    logger.log("daily", "\n".join(["\t".join(titles), ["\t".join(r) for r in rows]]))
+    logger.log("daily", "\n".join(["\t".join(titles)] + ["\t".join([str(i) for i in r]) for r in rows]))
     add_paragraph_with_array("Connected machines", col_titles=titles, rows=rows)
 
 
