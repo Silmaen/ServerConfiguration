@@ -388,6 +388,7 @@ def get_machines_since(date):
     for machine in logout_machines:
         print(machine)
         if machine not in ret:
+            print("machine not in ret")
             ret.append([
                 machine.name,
                 machine.ip,
@@ -397,6 +398,7 @@ def get_machines_since(date):
                 "Disconnected"
             ])
         else:
+            print("machine already in ret")
             for i in range(len(ret)):
                 if ret[i] != machine:
                     continue
