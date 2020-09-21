@@ -235,14 +235,11 @@ def get_connected_since(start):
     db = DatabaseHelper()
     ret, machines = db.select("ConnexionArchive", " WHERE `ConnexionEnd` > '" + str(start) +
                               "' ORDER BY `MachineName` ASC")
-    print("SELECT * FROM `ConnexionArchive` WHERE `ConnexionEnd` > '" + str(start) +
-          "' ORDER BY `MachineName` ASC ")
     if not ret:
         logger.log_error("ConnexionArchiveDb", "Connexion problems")
         return []
     ret = []
     for m in machines:
-        print(m)
         mm = Machine(m["MachineName"], m["MAC Address"], m["IP"], m["OutMachine"], m["ConnexionStart"])
         mm.active = False
         mm.disconnected = m["ConnexionEnd"]
@@ -379,10 +376,7 @@ def get_machines_since(date):
     now = datetime.datetime.now()
     logout_machines = get_connected_since(date)
     ret = []
-    print("ConnectedMachine")
     for machine in active_machines:
-
-        print(machine)
         ret.append([
             machine.name,
             machine.ip,
@@ -391,10 +385,7 @@ def get_machines_since(date):
             now - machine.started,
             "Connected"
         ])
-
-    print("LogoutMachine since " + str(date))
     for machine in logout_machines:
-        print(machine)
         found = False
         for i_machine in range(len(ret)):
             if ret[i_machine][0] == machine.name:
