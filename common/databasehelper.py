@@ -245,15 +245,15 @@ class DatabaseHelper:
         if not self.__check_table_name(table_name):
             return -1
         if not self.__check_column(table_name, know_content):
-            return -1
+            return -2
         req = "SELECT `ID` FROM `" + table_name + "` WHERE " + \
               " AND ".join(["`" + k + "` = '" + str(v) + "'" for k, v in know_content.items()])
         ret = self.__request(req)
         if not ret:
-            return -1
+            return -3
         fetch = [r[0] for r in self.__cur.fetchall()]
         if len(fetch) == 0:
-            return -1
+            return -4
         if len(fetch) != 1 and unique:
-            return -1
+            return -5
         return fetch[-1]
