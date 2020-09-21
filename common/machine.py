@@ -344,7 +344,7 @@ def update_active_machine_database():
         if machine.inDB:
             e_id = db.get_id("ActiveMachine", mac_dict)
             if e_id < 0:
-                logger.log_error("machine compare", "ERROR(" + e_id + "): unable to get ID for " + str(machine))
+                logger.log_error("machine compare", "ERROR(" + str(e_id) + "): unable to get ID for " + str(machine))
                 continue
             if machine.active:
                 # machine already in DB ans still active: does the mac to be updated?
