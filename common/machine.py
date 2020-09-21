@@ -240,7 +240,7 @@ def get_connected_since(start):
         return []
     ret = []
     for m in machines:
-        mm = Machine(m["MachineName"], m["MAC Address"], m["IP"], m["OutMachine"], m["ConnexionStart"])
+        mm = Machine(m["MachineName"].replace(".argawaen.net", ""), m["MAC Address"], m["IP"], m["OutMachine"], m["ConnexionStart"])
         mm.active = False
         mm.disconnected = m["ConnexionEnd"]
         ret.append(mm)
