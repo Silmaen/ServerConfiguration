@@ -413,7 +413,6 @@ def get_machines_since(date):
             if not is_valid_mac(ret[i_machine][2]):
                 ret[i_machine][2] = get_true_mac(machine.mac, ret[i_machine][2])
             ret[i_machine][4] += machine.disconnected - machine.started
-            break
     return cols, ret
 
 
