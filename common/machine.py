@@ -366,7 +366,7 @@ def update_active_machine_database():
                 logger.log_error("machine compare", "SHOULD NOT HAPPEND: machine badly formed: " + str(machine))
 
 
-def get_current_day_machines():
+def get_machines_since(date):
     """
     check database for the current day content of machine database
     :return:
@@ -374,8 +374,7 @@ def get_current_day_machines():
     cols = ["Name", "IP", "MAC", "external", "Duration", "status"]
     active_machines = get_active_machine_db()
     now = datetime.datetime.now()
-    day_begin = datetime.datetime(now.year, now.month, now.day)
-    logout_machines = get_connected_since(day_begin)
+    logout_machines = get_connected_since(date)
     ret = []
     for machine in active_machines:
         ret.append([
@@ -405,3 +404,13 @@ def get_current_day_machines():
                 ret[i][3] += machine.disconnected - machine.started
                 break
     return cols, ret
+
+
+def get_current_day_machines():
+    """
+    check database for the current day content of machine database
+    :return:
+    """
+    now = datetime.datetime.now()
+    day_begin = datetime.datetime(now.year, now.month, now.day)
+    return get_machines_since(day_begin)
