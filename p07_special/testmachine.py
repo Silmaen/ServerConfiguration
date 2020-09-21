@@ -14,7 +14,9 @@ def network():
     titles, rows = get_machines_since(date)
     logger.log("daily", "Connected machines:")
     logger.log("daily", "\n".join(["\t".join(titles)] + ["\t".join([str(i) for i in r]) for r in rows]))
-    #add_paragraph_with_array("Connected machines", col_titles=titles, rows=rows)
+    print("Connected machines:")
+    print("\n".join(["\t".join(titles)] + ["\t".join([str(i) for i in r]) for r in rows]))
+    # add_paragraph_with_array("Connected machines", col_titles=titles, rows=rows)
 
 
 class Interface:

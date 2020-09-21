@@ -374,7 +374,8 @@ def get_machines_since(date):
     cols = ["Name", "IP", "MAC", "external", "Duration", "status"]
     active_machines = get_active_machine_db()
     now = datetime.datetime.now()
-    logout_machines = get_connected_since(date)
+    #logout_machines = get_connected_since(date)
+    logout_machines = []
     ret = []
     for machine in active_machines:
         ret.append([
