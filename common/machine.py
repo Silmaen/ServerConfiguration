@@ -375,8 +375,6 @@ def get_machines_since(date):
     active_machines = get_active_machine_db()
     now = datetime.datetime.now()
     logout_machines = get_connected_since(date)
-    print(logout_machines)
-    logout_machines = []
     ret = []
     for machine in active_machines:
         ret.append([
@@ -388,6 +386,7 @@ def get_machines_since(date):
             "Connected"
         ])
     for machine in logout_machines:
+        print(machine)
         if machine not in ret:
             ret.append([
                 machine.name,
