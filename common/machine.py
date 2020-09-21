@@ -219,7 +219,7 @@ def get_active_machine_db():
         return []
     ret = []
     for m in machines:
-        mm = Machine(m["MachineName"], m["MAC Address"], m["IP"], m["OutMachine"], m["ConnexionStart"])
+        mm = Machine(m["MachineName"].replace(".argawaen.net", ""), m["MAC Address"], m["IP"], m["OutMachine"], m["ConnexionStart"])
         mm.inDB = True
         mm.active = False
         ret.append(mm)
@@ -283,7 +283,7 @@ def get_connected_machines():
             logger.log_error("Machine", "unable to machine IP: '" + host + "' :" + str(err))
             ip = "0.0.0.0" 
         """
-        mach = Machine(name=host, ip=ip, mac=mac, outmachine=(conif == "re0"))
+        mach = Machine(name=host.replace(".argawaen.net", ""), ip=ip, mac=mac, outmachine=(conif == "re0"))
         mach.active = True
         ret.append(mach)
     return ret
