@@ -376,7 +376,10 @@ def get_machines_since(date):
     now = datetime.datetime.now()
     logout_machines = get_connected_since(date)
     ret = []
+    print("ConnectedMachine")
     for machine in active_machines:
+
+        print(machine)
         ret.append([
             machine.name,
             machine.ip,
@@ -385,6 +388,8 @@ def get_machines_since(date):
             now - machine.started,
             "Connected"
         ])
+
+    print("LogoutMachine since " + str(date))
     for machine in logout_machines:
         print(machine)
         found = False
@@ -393,7 +398,6 @@ def get_machines_since(date):
                 found = True
                 break
         if not found:
-            print("machine not in ret")
             ret.append([
                 machine.name,
                 machine.ip,
@@ -403,7 +407,6 @@ def get_machines_since(date):
                 "Disconnected"
             ])
         else:
-            print("machine already in ret")
             if not is_valid_mac(ret[i_machine][2]):
                 ret[i_machine][2] = get_true_mac(machine.mac, ret[i_machine][2])
             ret[i_machine][4] += machine.disconnected - machine.started

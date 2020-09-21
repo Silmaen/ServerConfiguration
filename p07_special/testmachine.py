@@ -10,7 +10,7 @@ def network():
     compute network statistics
     :return:
     """
-    date = datetime.datetime(2020, 7, 1)
+    date = datetime.datetime(2020, 9, 1)
     titles, rows = get_machines_since(date)
     logger.log("daily", "Connected machines:")
     logger.log("daily", "\n".join(["\t".join(titles)] + ["\t".join([str(i) for i in r]) for r in rows]))
