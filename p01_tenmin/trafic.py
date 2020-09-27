@@ -19,6 +19,9 @@ def add_to_data(old_interface, r_interface):
         ft.close()
         for line in ll:
             item = line.split()
+            if len(item) != 3:
+                logger.log_error("trafic.add_to_data", "Bad format for entry in trafic file '" + line + "'")
+                continue
             values[item[0]] = {"out": int(item[1]), "in": int(item[2])}
     ft = open(traffic_file_day, "w")
     for key in Interface.keys():
