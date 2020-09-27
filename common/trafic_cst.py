@@ -43,6 +43,9 @@ def get_traffic():
         if "<Link>" not in line:
             continue
         word = line_word(line)
+        if len(word) < 3:
+            logger.log_error("get_traffic", "bad lin format '" + line + "'")
+            continue
         if word[0] not in Interface.keys():
             continue
         out = int(word[-1])
@@ -69,6 +72,9 @@ def load():
     ft.close()
     for line in lines:
         item = line.split()
+        if len(item) < 3:
+            logger.log_error("load", "bad line format '" + line + "'")
+            continue
         res[item[0]] = {"out": int(item[1]), "in": int(item[2])}
     return res
 
@@ -82,6 +88,9 @@ def load_result():
     ft.close()
     for line in lines:
         item = line.split()
+        if len(item) < 3:
+            logger.log_error("load_results", "bad line format '" + line + "'")
+            continue
         res[item[0]] = {"out": int(item[1]), "in": int(item[2])}
     return res
 
