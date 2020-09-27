@@ -18,6 +18,8 @@ def add_to_data(old_interface, r_interface):
         ll = ft.readlines()
         ft.close()
         for line in ll:
+            if len(line.strip()) == 0:
+                continue
             item = line.split()
             if len(item) != 3:
                 logger.log_error("trafic.add_to_data", "Bad format for entry in trafic file '" + line + "'")

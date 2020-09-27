@@ -40,6 +40,8 @@ def get_traffic():
         logger.log_error("get_traffic", "retrieving traffic without result")
     res_interface = {}
     for line in results:
+        if len(line.strip()) == 0:
+            continue
         if "<Link>" not in line:
             continue
         word = line_word(line)
@@ -71,6 +73,8 @@ def load():
     lines = ft.readlines()
     ft.close()
     for line in lines:
+        if len(line.strip()) == 0:
+            continue
         item = line.split()
         if len(item) < 3:
             logger.log_error("load", "bad line format '" + line + "'")
@@ -87,6 +91,8 @@ def load_result():
     lines = ft.readlines()
     ft.close()
     for line in lines:
+        if len(line.strip()) == 0:
+            continue
         item = line.split()
         if len(item) < 3:
             logger.log_error("load_results", "bad line format '" + line + "'")
