@@ -91,8 +91,8 @@ def main(dry_run: bool = False):
         f.close()
     '''
 
-    for w in wan:
-        w["state"] = False
+    for w in wan.keys():
+        wan[w]["state"] = False
     for it in get_default_routes():
         if it not in wan.keys():
             continue
