@@ -342,7 +342,7 @@ def update_active_machine_database():
                 "OutMachine": [0, 1][machine.outmachine]
             }
         if machine.inDB:
-            e_id = db.get_id("ActiveMachine", mac_dict)
+            e_id = db.get_id("ActiveMachine", {"MachineName": machine.name, "IP": machine.ip})
             if e_id < 0:
                 logger.log_error("machine compare", "ERROR(" + str(e_id) + "): unable to get ID for " + str(machine))
                 continue
