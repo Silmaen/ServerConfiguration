@@ -25,7 +25,7 @@ def get_default_routes():
     get the list of the actual default routes
     :return: the list of default routes
     """
-    lines = direct_system_exec("route show -inet | grep default")
+    ret, lines = direct_system_exec("route show -inet | grep default")
     default_routes = []
     for line in lines:
         default_routes.append(line.split()[1])
