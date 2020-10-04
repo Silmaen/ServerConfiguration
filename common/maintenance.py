@@ -50,6 +50,31 @@ def system_exec(cmd: str, who: str = "", what: str = ""):
     return p.returncode, lines
 
 
+def direct_system_exec(cmd: str):
+    import subprocess
+    if cmd == "":
+        return 1, []
+    try:
+        p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+        enc = os.device_encoding(1)
+        if not enc:
+            enc = "ascii"
+        lines = p.stdout.decode(enc, errors='ignore').splitlines()
+    except:
+        return 1, []
+    return p.returncode, lines
+
+
+def silent_system_exec(cmd: str):
+    import subprocess
+    if cmd == "":
+        return 1
+    try:
+        return subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True).returncode
+    except:
+        return 1
+
+
 def get_last_ip():
     old_ip = "0.0.0.0"
     if os.path.exists(ip_file):

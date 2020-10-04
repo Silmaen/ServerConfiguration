@@ -20,11 +20,16 @@ pingcmd = "ping -q -c 1 -w 1 "
 valid_action = ["add", "delete"]
 
 
-def system_exec2(cmd: str):
-    import subprocess
-    if cmd == "":
-        return 1
-    return subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True).returncode
+def get_default_routes():
+    """
+    get the list of the actual default routes
+    :return: the list of default routes
+    """
+    lines = direct_system_exec("route show -inet | grep default")
+    default_routes = []
+    for line in lines:
+        default_routes.append(line.split()[1])
+    return default_routes
 
 
 def route(action, qui):
@@ -33,14 +38,14 @@ def route(action, qui):
     if qui not in wan.keys():
         return
     cmd = "/sbin/route " + action + " -mpath default " + wan[qui]["ip"]
-    system_exec2(cmd)
+    silent_system_exec(cmd)
 
 
 def wan_up(qui):
     if qui not in wan.keys():
         return False
     cmd = pingcmd + wan[qui]["ip"]
-    code = system_exec2(cmd)
+    code = silent_system_exec(cmd)
     if code == 0:
         return True
     return False
@@ -51,7 +56,7 @@ def wan_online(qui):
         return False
     for pin in wan[qui]["routes"]:
         cmd = pingcmd + pin
-        code = system_exec2(cmd)
+        code = silent_system_exec(cmd)
         if code == 0:
             return True
     return False
@@ -74,6 +79,7 @@ def main(dry_run: bool = False):
     :param dry_run: if the script should be run without system modification
     :return:
     """
+    '''
     if os.path.exists(datastate):
         f = open(datastate, "r")
         lines = f.readlines()
@@ -83,6 +89,15 @@ def main(dry_run: bool = False):
                 continue
             wan[it[0]]["state"] = o2b(it[1])
         f.close()
+    '''
+
+    for w in wan:
+        w["state"] = False
+    for it in get_default_routes():
+        if it not in wan.keys():
+            continue
+        wan[it]["state"] = True
+
     for w in wan.keys():
         state = False
         if wan_up(w):
@@ -96,11 +111,13 @@ def main(dry_run: bool = False):
                     route("add", w)
                 else:
                     route("delete", w)
+    '''
     if not dry_run:
         f = open(datastate, "w")
         for w in wan.keys():
             f.write(w + " " + b2o(wan[w]["state"]) + "\n")
         f.close()
+    '''
 
 
 if __name__ == "__main__":
